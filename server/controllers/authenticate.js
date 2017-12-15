@@ -1,12 +1,12 @@
 const User = require("../models").user;
-const jwt = require('jwt-simple');
+const jwt = require("jwt-simple");
 
-const generateToken = (user)=>{
+const generateToken = user => {
     const timestamp = new Date().getTime();
-    return jwt.encode({ sub: user.id, iat: timestamp}, "sfasfdsfwegkal");
+    return jwt.encode({ sub: user.id, iat: timestamp }, "sfasfdsfwegkal");
 };
 
-module.exports = (req, res, next) => {
+module.exports.signup = (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -45,10 +45,37 @@ module.exports = (req, res, next) => {
             if (!created) {
                 res.status(422).send({ error: "Email already in use!" });
             } else {
-                res.send({password:user.password});
+                res.send({ password: user.password });
             }
         });
     } catch (e) {
         next(e);
     }
+};
+
+module.exports.login = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.findOne({ where: { mail: email } }).then(user => {
+        if (!user) {
+            res.status(422).send({ error: "Cannot find your email!" });
+        } else {
+            let promise = new Promise((resolve, reject) => {
+                let response = user.validatePassword(
+                    user,
+                    password,
+                    user.password
+                );
+                resolve(response);
+            });
+            promise.then(response => {
+                if (response) {
+                    res.send({ user: user });
+                } else {
+                    res.status(422).send({ error: "Incorret password!" });
+                }
+            });
+        }
+    });
 };
