@@ -8,8 +8,9 @@ const generateToken = (user)=>{
 
 module.exports = (req, res, next) => {
     try {
+        console.log('!!!!', new User().generateHash);
         const email = req.body.email;
-        const password = req.body.password;
+        const password = new User().generateHash(req.body.password);
         const username = req.body.username;
         const sex = req.body.sex;
         const age = req.body.age;
