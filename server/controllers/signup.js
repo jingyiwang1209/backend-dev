@@ -1,4 +1,10 @@
 const User = require("../models").user;
+const jwt = require('jwt-simple');
+
+const generateToken = (user)=>{
+    const timestamp = new Date().getTime();
+    return jwt.encode({ sub: user.id, iat: timestamp}, "sfasfdsfwegkal");
+};
 
 module.exports = (req, res, next) => {
     try {
@@ -37,9 +43,9 @@ module.exports = (req, res, next) => {
             // console.log(user.get({plain:true}));
             // console.log(created);
             if (!created) {
-                return res.status(422).send({ error: "Email already in use!" });
+                res.status(422).send({ error: "Email already in use!" });
             } else {
-                res.send(user);
+                res.send({token:generateToken(user.id)});
             }
         });
     } catch (e) {
