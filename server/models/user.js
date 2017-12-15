@@ -46,9 +46,9 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  User.prototype.validatePassword = function(user, candidatePassword, password) {
-    return user
-      .comparePassword(candidatePassword, password)
+  User.prototype.validatePassword = function(candidatePassword) {
+    return this
+      .comparePassword(candidatePassword, this.password)
       .then(resp => {
         return resp == true;
       })
