@@ -8,9 +8,8 @@ const generateToken = (user)=>{
 
 module.exports = (req, res, next) => {
     try {
-        console.log('!!!!', new User().generateHash);
         const email = req.body.email;
-        const password = new User().generateHash(req.body.password);
+        const password = req.body.password;
         const username = req.body.username;
         const sex = req.body.sex;
         const age = req.body.age;
@@ -46,7 +45,7 @@ module.exports = (req, res, next) => {
             if (!created) {
                 res.status(422).send({ error: "Email already in use!" });
             } else {
-                res.send({token:generateToken(user.id)});
+                res.send({password:user.password});
             }
         });
     } catch (e) {
