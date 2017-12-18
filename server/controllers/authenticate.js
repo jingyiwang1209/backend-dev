@@ -1,9 +1,30 @@
 const User = require("../models").user;
-const jwt = require("jwt-simple");
+// const jwt = require("jwt-simple");
+const jsonWebToken = require("jsonwebtoken");
 
 const generateToken = user => {
     const timestamp = new Date().getTime();
-    return jwt.encode({ sub: user.id, iat: timestamp }, "sfasfdsfwegkal");
+    // return jwt.encode({ sub: user.id, iat: timestamp }, "sfasfdsfwegkal");
+    return new Promise((resolve, reject) => {
+        jsonWebToken.sign(
+            { sub: user.id, iat: timestamp },
+            "sfasfdsfwegkal",
+            function(err, token) {
+                console.log("token", token);
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(token);
+            }
+        );
+    }).then((res, err) => {
+        if (res) {
+            console.log("res", res);
+            return res;
+        } else {
+            return err;
+        }
+    });
 };
 
 module.exports.signup = (req, res, next) => {

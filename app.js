@@ -1,6 +1,7 @@
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
+const jsonWebToken = require('jsonwebtoken');
 const routes = require('./server/routes/routes');
 
 // Set up the express app
@@ -12,6 +13,21 @@ app.use(logger('dev'));
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use((req, res, next)=>{
+    if(req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT' ){
+        console.log('authorization', req.headers.authorization);
+        jsonWebToken.verify(req.headers.authorization.split(' ')[1], 'sfasfdsfwegkal', (err, decode)=>{
+            if(err) { req.user = undefined;}
+            req.user = decoded;
+            next();
+        });
+    }else {
+        console.log('authorization', req.headers.authorization);
+        req.user = undefined;
+        next();
+    }
+
+});
 
 routes(app);
 
