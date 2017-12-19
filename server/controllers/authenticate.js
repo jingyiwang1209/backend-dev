@@ -10,20 +10,12 @@ const generateToken = user => {
             { sub: user.id, iat: timestamp },
             "sfasfdsfwegkal",
             function(err, token) {
-                console.log("token", token);
                 if (err) {
                     return reject(err);
                 }
                 return resolve(token);
             }
         );
-    }).then((res, err) => {
-        if (res) {
-            console.log("res", res);
-            return res;
-        } else {
-            return err;
-        }
     });
 };
 
@@ -66,7 +58,14 @@ module.exports.signup = (req, res, next) => {
             if (!created) {
                 res.status(422).send({ error: "Email already in use!" });
             } else {
-                // res.send({ token: generateToken(user) });
+                let jwtPromise = generateToken(user);
+                jwtPromise.then((response, err) => {
+                    if (response) {
+                        res.send({ token: response });
+                    } else {
+                        res.send({ msg: "Unable to generateToken" });
+                    }
+                });
             }
         });
     } catch (e) {
@@ -85,7 +84,14 @@ module.exports.login = (req, res, next) => {
             let promise = user.comparePassword(password);
             promise.then((response, err) => {
                 if (response) {
-                    res.send('correct!');
+                    let jwtPromise = generateToken(user);
+                    jwtPromise.then((response, err) => {
+                        if (response) {
+                            res.send({ token: response });
+                        } else {
+                            res.send({ msg: "Unable to generateToken" });
+                        }
+                    });
                 } else {
                     res.status(422).send({ error: "Incorret password!" });
                 }
