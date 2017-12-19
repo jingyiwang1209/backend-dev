@@ -66,7 +66,7 @@ module.exports.signup = (req, res, next) => {
             if (!created) {
                 res.status(422).send({ error: "Email already in use!" });
             } else {
-                res.send({ token: generateToken(user) });
+                // res.send({ token: generateToken(user) });
             }
         });
     } catch (e) {
@@ -82,13 +82,10 @@ module.exports.login = (req, res, next) => {
         if (!user) {
             res.status(422).send({ error: "Cannot find your email!" });
         } else {
-            let promise = new Promise((resolve, reject) => {
-                let response = user.validatePassword(password);
-                resolve(response);
-            });
-            promise.then(response => {
+            let promise = user.comparePassword(password);
+            promise.then((response, err) => {
                 if (response) {
-                    res.send({ token: generateToken(user) });
+                    res.send('correct!');
                 } else {
                     res.status(422).send({ error: "Incorret password!" });
                 }

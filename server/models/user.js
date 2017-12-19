@@ -35,26 +35,15 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  User.prototype.comparePassword = function(candidatePassword, password) {
+  User.prototype.comparePassword = function(candidatePassword) {
+    let password=this.password;
     return new Promise(function(resolve, reject) {
-      bcrypt.compare(candidatePassword, password, function(err, res) {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(res);
+      bcrypt.compare(candidatePassword, password, function(err, res){
+         if(err) reject(err);
+         resolve(res);
+
       });
     });
-  };
-
-  User.prototype.validatePassword = function(candidatePassword) {
-    return this
-      .comparePassword(candidatePassword, this.password)
-      .then(resp => {
-        return resp == true;
-      })
-      .catch(err => {
-        if (err) console.log(err);
-      });
   };
 
   User.beforeCreate((user, options) => {
