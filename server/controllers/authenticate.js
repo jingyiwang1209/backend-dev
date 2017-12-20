@@ -77,7 +77,7 @@ module.exports.login = (req, res, next) => {
 
     User.findOne({ where: { mail: email } }).then(user => {
         if (!user) {
-            res.status(422).send({ error: "Cannot find your email!" });
+            res.send({ error: "Cannot find your email!" });
         } else {
             let promise = user.comparePassword(password);
             promise.then((response, err) => {
@@ -87,11 +87,11 @@ module.exports.login = (req, res, next) => {
                         if (response) {
                             res.send({ token: response });
                         } else {
-                            res.send({ msg: "Unable to generateToken" });
+                            res.send({ error: "Unable to generateToken" });
                         }
                     });
                 } else {
-                    res.status(422).send({ error: "Incorret password!" });
+                    res.send({ error:"Incorret password!"});
                 }
             });
         }

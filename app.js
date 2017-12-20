@@ -33,8 +33,8 @@ app.get("*", (req, res) =>
     })
 );
 
-app.use((err, req, res, next) => {
-    res.status(404).send({ error: err.message });
-});
+// app.use((err, req, res, next) => {
+//     res.status(404).send({ error: err.message });
+// });
 
 module.exports = app;
