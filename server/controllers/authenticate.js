@@ -54,14 +54,14 @@ module.exports.signup = (req, res, next) => {
             // console.log(user.get({plain:true}));
             // console.log(created);
             if (!created) {
-                res.status(422).send({ error: "Email already in use!" });
+                res.send({ error: "Email already in use!" });
             } else {
                 let jwtPromise = generateToken(user);
                 jwtPromise.then((response, err) => {
                     if (response) {
                         res.send({ token: response });
                     } else {
-                        res.send({ msg: "Unable to generateToken" });
+                        res.send({ error: "Unable to generateToken" });
                     }
                 });
             }
