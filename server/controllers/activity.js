@@ -1,8 +1,8 @@
-const Activity = require("../models").activity;
+const Activity = require("../models").Activity;
 
 module.exports.addActivity = (userId, req, res, next) => {
     try {
-
+        console.log('userId',userId);
         const {
             location,
             departtime,

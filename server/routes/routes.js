@@ -23,5 +23,5 @@ module.exports = app => {
     app.get("/api/test", verifyToken, (req, res, next) => {
         res.send("This is a test for jwt!");
     });
-    app.post('/api/addActivity/:userId', verifyToken, addActivity);
+    app.post('/api/addActivity', verifyToken, addActivity);
 };
