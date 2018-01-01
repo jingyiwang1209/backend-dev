@@ -1,34 +1,37 @@
 const Activity = require("../models").Activity;
+const User = require("../models").user;
 
 module.exports.addActivity = (userId, req, res, next) => {
     try {
         console.log('userId',userId);
         const {
             location,
-            departtime,
-            finishtime,
+            departdate,
+            finishdate,
             budget,
             services,
             story,
             images
         } = req.body;
-        Activity.findById(userId).then((Activity)=>Activity.findOrCreate({
+        Activity.findOrCreate({
             where: {
                 location,
-                departtime,
-                finishtime,
-                budget,
-                services,
-                story
-            },
-            default: {
-                location,
-                departtime,
-                finishtime,
+                departdate,
+                finishdate,
                 budget,
                 services,
                 story,
-                images
+                userId
+            },
+            default: {
+                location,
+                departdate,
+                finishdate,
+                budget,
+                services,
+                story,
+                images,
+                userId
             }
         }).spread((activity, created) => {
             if (!created) {
@@ -38,7 +41,7 @@ module.exports.addActivity = (userId, req, res, next) => {
                     activity: "This activity is successfully created!"
                 });
             }
-        }));
+        });
     } catch (e) {
         next(e);
     }

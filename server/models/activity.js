@@ -13,14 +13,16 @@ module.exports = (sequelize, DataTypes) => {
     images: {
       type:DataTypes.ARRAY(DataTypes.BLOB),
       defaultValue:[],
-    }
+    },
+
   });
 
   Activity.associate = function(models) {
-    Activity.belongsTo(models.user, {
-      foreignKey: "userId",
-      onDelete: "CASCADE",
+    Activity.belongsTo(models.User, {
+      foreignKey: 'userId',
+      onDelete: 'CASCADE',
     });
   };
+
   return Activity;
 };

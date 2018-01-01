@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("Activities", {
+    return queryInterface.createTable('Activities', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -21,13 +21,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       services: {
-        type: Sequelize.ARRAY((Sequelize.TEXT))
+        type: Sequelize.ARRAY(Sequelize.TEXT)
       },
       story: {
         type: Sequelize.STRING
       },
       images: {
-        type: Sequelize.ARRAY((Sequelize.BLOB))
+        type: Sequelize.ARRAY(Sequelize.BLOB)
       },
       createdAt: {
         allowNull: false,
@@ -36,10 +36,19 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Users',
+          key: 'id',
+          as: 'userId',
+        },
+      },
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("Activities");
+    return queryInterface.dropTable('Activities');
   }
 };
