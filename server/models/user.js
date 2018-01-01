@@ -19,7 +19,12 @@ module.exports = (sequelize, DataTypes) => {
     personality: DataTypes.STRING
   });
 
-  User.associate = function(model) {};
+  User.associate = function(models) {
+     User.hasMany(models.Activity, {
+      foreignKey:'userId',
+      as:'activities'
+     });
+  };
 
   User.prototype.cryptPassword = function(password) {
     return new Promise(function(resolve, reject) {
@@ -41,7 +46,6 @@ module.exports = (sequelize, DataTypes) => {
       bcrypt.compare(candidatePassword, password, function(err, res){
          if(err) reject(err);
          resolve(res);
-
       });
     });
   };

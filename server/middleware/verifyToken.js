@@ -6,9 +6,10 @@ module.exports = (req, res, next) => {
             req.headers.authorization,
             "sfasfdsfwegkal",
             (err, decoded) => {
+                // console.log(decoded);
                 // decode { sub: 19, iat: 1513644411790 }
                 if (err) req.user = undefined;
-                else next();
+                else next(decoded.sub);
             }
         );
     } else {
