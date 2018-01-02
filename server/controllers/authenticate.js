@@ -57,5 +57,4 @@ module.exports.signup = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
     res.send({ token:generateToken(req.user)});
-
 };

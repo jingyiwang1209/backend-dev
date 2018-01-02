@@ -1,9 +1,8 @@
 const Activity = require("../models").Activity;
 const User = require("../models").user;
 
-module.exports.addActivity = (userId, req, res, next) => {
+module.exports.addActivity = (req, res, next) => {
     try {
-        console.log('userId',userId);
         const {
             location,
             departdate,
@@ -13,6 +12,8 @@ module.exports.addActivity = (userId, req, res, next) => {
             story,
             images
         } = req.body;
+        const userId = req.user.id;
+        console.log("userId", userId);
         Activity.findOrCreate({
             where: {
                 location,
@@ -21,6 +22,7 @@ module.exports.addActivity = (userId, req, res, next) => {
                 budget,
                 services,
                 story,
+                images,
                 userId
             },
             default: {
