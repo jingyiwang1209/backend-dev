@@ -1,20 +1,10 @@
 const User = require("../models").User;
-const jsonWebToken = require("jsonwebtoken");
+const jwt = require("jwt-simple");
+const keys = require("../config/keys");
 
 const generateToken = user => {
     const timestamp = new Date().getTime();
-    return new Promise((resolve, reject) => {
-        jsonWebToken.sign(
-            { sub: user.id, iat: timestamp },
-            "sfasfdsfwegkal",
-            function(err, token) {
-                if (err) {
-                    return reject(err);
-                }
-                return resolve(token);
-            }
-        );
-    });
+    return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
 
 module.exports.signup = (req, res, next) => {
@@ -56,14 +46,8 @@ module.exports.signup = (req, res, next) => {
             if (!created) {
                 res.send({ error: "Email already in use!" });
             } else {
-                let jwtPromise = generateToken(user);
-                jwtPromise.then((response, err) => {
-                    if (response) {
-                        res.send({ token: response });
-                    } else {
-                        res.send({ error: "Unable to generateToken" });
-                    }
-                });
+                let token = generateToken(user);
+                res.send({ token });
             }
         });
     } catch (e) {
@@ -72,28 +56,6 @@ module.exports.signup = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-    const email = req.body.email;
-    const password = req.body.password;
+    res.send({ token:generateToken(req.user)});
 
-    User.findOne({ where: { mail: email } }).then(user => {
-        if (!user) {
-            res.send({ error: "Cannot find your email!" });
-        } else {
-            let promise = user.comparePassword(password);
-            promise.then((response, err) => {
-                if (response) {
-                    let jwtPromise = generateToken(user);
-                    jwtPromise.then((response, err) => {
-                        if (response) {
-                            res.send({ token: response });
-                        } else {
-                            res.send({ error: "Unable to generateToken" });
-                        }
-                    });
-                } else {
-                    res.send({ error:"Incorret password!"});
-                }
-            });
-        }
-    });
 };
