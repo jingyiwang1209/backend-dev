@@ -9,19 +9,7 @@ const generateToken = user => {
 
 module.exports.signup = (req, res, next) => {
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-        const username = req.body.username;
-        const sex = req.body.sex;
-        const age = req.body.age;
-        const city = req.body.city;
-        const yearOfLiving = req.body.yearOfLiving;
-        const hometown = req.body.hometown;
-        const school = req.body.school;
-        const major = req.body.major;
-        const language = req.body.language;
-        const hobby = req.body.hobby;
-        const personality = req.body.personality;
+        const { email, password, username,sex,age,city,yearOfLiving,hometown,school,major,language,hobby,personality} = req.body
 
         User.findOrCreate({
             where: { mail: email },

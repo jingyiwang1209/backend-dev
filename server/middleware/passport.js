@@ -13,14 +13,14 @@ const localLogin = new LocalStrategy({ usernameField: "email" }, function(
 ) {
     User.findOne({ where: { mail: email } }).then(user => {
         if (!user) {
-            return done(null, false, { error: "Cannot find your email!" });
+            return done(null, false, { message: "The email does not exist."});
         } else {
             let promise = user.comparePassword(password);
             promise.then((response, err) => {
                 if (response) {
                     return done(null, user);
                 } else {
-                    return done(null, false, { error: "Incorrect password." });
+                    return done(null, false, { message: "The passport is not correct."});
                 }
             });
         }
