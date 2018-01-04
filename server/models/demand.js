@@ -1,6 +1,6 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
-  const Activity = sequelize.define("Activity", {
+  const Demand = sequelize.define("Demand", {
     location: DataTypes.STRING,
     departdate: DataTypes.STRING,
     finishdate: DataTypes.STRING,
@@ -8,21 +8,16 @@ module.exports = (sequelize, DataTypes) => {
     services: {
       type:DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue:[],
-    },
-    story: DataTypes.STRING,
-    images: {
-      type:DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue:[],
-    },
+    }
 
   });
 
-  Activity.associate = function(models) {
-    Activity.belongsTo(models.User, {
+  Demand.associate = function(models) {
+    Demand.belongsTo(models.User, {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
   };
 
-  return Activity;
+  return Demand;
 };

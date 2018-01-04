@@ -12,22 +12,22 @@ module.exports.addDemand = (req, res, next) => {
                 departdate,
                 finishdate,
                 budget,
-                services
+                services,
+                userId
             },
             default: {
                 location,
                 departdate,
                 finishdate,
                 budget,
-                services
+                services,
+                userId
             }
-        }).spread((Demand, created) => {
+        }).spread((demand, created) => {
             if (!created) {
-                res.send({ error: "This demand is already created" });
+                res.send("This demand is already created!");
             } else {
-                res.send({
-                    Demand: "This demand is successfully created!"
-                });
+                res.send("This demand is successfully created!");
             }
         });
     } catch (e) {

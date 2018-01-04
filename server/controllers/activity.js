@@ -1,8 +1,15 @@
 const Activity = require("../models").Activity;
 const User = require("../models").user;
 
+
 module.exports.addActivity = (req, res, next) => {
     try {
+        const images = req.body.images;
+        const imageURLs = images.map((image)=>{
+             let imageURL = image[0].preview.slice(5);
+             return imageURL;
+        });
+
         const {
             location,
             departdate,
@@ -10,7 +17,6 @@ module.exports.addActivity = (req, res, next) => {
             budget,
             services,
             story,
-            images
         } = req.body;
         const userId = req.user.id;
         console.log("userId", userId);
@@ -22,7 +28,7 @@ module.exports.addActivity = (req, res, next) => {
                 budget,
                 services,
                 story,
-                images,
+                images:imageURLs,
                 userId
             },
             default: {
@@ -32,16 +38,14 @@ module.exports.addActivity = (req, res, next) => {
                 budget,
                 services,
                 story,
-                images,
+                images:imageURLs,
                 userId
             }
         }).spread((activity, created) => {
             if (!created) {
-                res.send({ error: "This activity is already created" });
+                res.send("This activity is already created" );
             } else {
-                res.send({
-                    activity: "This activity is successfully created!"
-                });
+                res.send("This activity is successfully created!");
             }
         });
     } catch (e) {
