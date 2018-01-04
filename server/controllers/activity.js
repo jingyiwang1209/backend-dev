@@ -11,6 +11,7 @@ module.exports.addActivity = (req, res, next) => {
         });
 
         const {
+            theme,
             location,
             departdate,
             finishdate,
@@ -19,9 +20,10 @@ module.exports.addActivity = (req, res, next) => {
             story,
         } = req.body;
         const userId = req.user.id;
-        console.log("userId", userId);
+        // console.log("userId", userId);
         Activity.findOrCreate({
             where: {
+                theme,
                 location,
                 departdate,
                 finishdate,
@@ -32,6 +34,7 @@ module.exports.addActivity = (req, res, next) => {
                 userId
             },
             default: {
+                theme,
                 location,
                 departdate,
                 finishdate,

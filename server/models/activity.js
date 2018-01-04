@@ -1,6 +1,7 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   const Activity = sequelize.define("Activity", {
+    theme:DataTypes.STRING,
     location: DataTypes.STRING,
     departdate: DataTypes.STRING,
     finishdate: DataTypes.STRING,
@@ -14,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue:[],
     },
+    stars: {
+      type:DataTypes.INTEGER,
+      defaultValue:0,
+    }
+
 
   });
 

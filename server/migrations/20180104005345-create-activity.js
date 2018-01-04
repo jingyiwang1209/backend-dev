@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      theme: {
+        type:Sequelize.STRING
+      },
       location: {
         type: Sequelize.STRING
       },
@@ -28,6 +31,9 @@ module.exports = {
       },
       images: {
         type: Sequelize.ARRAY(Sequelize.TEXT)
+      },
+      stars: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
