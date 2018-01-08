@@ -1,6 +1,6 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
-  const Demand = sequelize.define("Demand", {
+  const Wish = sequelize.define("Wish", {
     location: DataTypes.STRING,
     departdate: DataTypes.STRING,
     finishdate: DataTypes.STRING,
@@ -12,12 +12,12 @@ module.exports = (sequelize, DataTypes) => {
 
   });
 
-  Demand.associate = function(models) {
-    Demand.belongsTo(models.User, {
+  Wish.associate = function(models) {
+    Wish.belongsTo(models.User, {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
   };
 
-  return Demand;
+  return Wish;
 };

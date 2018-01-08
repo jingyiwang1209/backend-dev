@@ -55,3 +55,19 @@ module.exports.addActivity = (req, res, next) => {
         next(e);
     }
 };
+
+module.exports.fetchActivity = (req, res, next) => {
+    try{
+        Activity.findAll().then((activities)=>{
+            if(activities){
+                const activityData = activities.map((activity)=>{
+                    return activity.dataValues;
+                });
+
+                res.send(activityData);
+            }
+        });
+    }catch(e){
+       next(e);
+    }
+}
