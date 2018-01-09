@@ -15,11 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue:[],
     },
-    stars: {
-      type:DataTypes.INTEGER,
-      defaultValue:0,
-    }
-
 
   });
 

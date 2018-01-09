@@ -41,8 +41,9 @@ const jwtLogin = new JwtStrategy(jwtOptions, function(jwt_payload, done) {
     // if it does, call 'done' with that user,
     // otherwise, call 'done' without that user obj
     User.findById(jwt_payload.sub).then(user => {
+        // console.log("user.dataValues", user.dataValues)
         if (user) {
-            return done(null, user);
+            return done(null, user.dataValues);
         } else {
             return done(null, false);
         }

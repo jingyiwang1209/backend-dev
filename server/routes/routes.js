@@ -8,6 +8,10 @@ const fetchWish = require("../controllers/wish").fetchWish;
 
 const addActivity = require("../controllers/activity").addActivity;
 const fetchActivity = require("../controllers/activity").fetchActivity;
+const clickLikes = require("../controllers/activity").clickLikes;
+
+
+
 
 const requireAuth = passport.authenticate("jwt", { session: false });
 const requireLogin = passport.authenticate("local", { session: false });
@@ -19,4 +23,5 @@ module.exports = app => {
     app.get("/api/fetchWish", requireAuth, fetchWish);
     app.post("/api/addActivity", requireAuth, addActivity);
     app.get("/api/fetchActivity", requireAuth, fetchActivity);
+    app.post("/api/clickLikes/:activityId", requireAuth, clickLikes);
 };

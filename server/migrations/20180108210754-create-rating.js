@@ -1,38 +1,20 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Activities', {
+    return queryInterface.createTable('Ratings', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      theme: {
-        type:Sequelize.STRING
-      },
-      location: {
+      feedback: {
         type: Sequelize.STRING
       },
-      departdate: {
-        type: Sequelize.STRING
+      numOfStars: {
+        type: Sequelize.INTEGER
       },
-      finishdate: {
-        type: Sequelize.STRING
-      },
-      budget: {
-        type: Sequelize.STRING
-      },
-      services: {
-        type: Sequelize.ARRAY(Sequelize.TEXT)
-      },
-      story: {
-        type: Sequelize.STRING
-      },
-      images: {
-        type: Sequelize.ARRAY(Sequelize.TEXT)
-      },
-      stars: {
+      userId: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -43,18 +25,19 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      userId: {
+
+      activityId:{
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
-          model: 'Users',
+          model: 'Activities',
           key: 'id',
-          as: 'userId',
+          as: 'activityId',
         },
-      },
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Activities');
+    return queryInterface.dropTable('Ratings');
   }
 };
