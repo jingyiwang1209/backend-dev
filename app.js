@@ -24,6 +24,7 @@ app.use(cors({
   }
 }));
 
+
 routes(app);
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
@@ -33,8 +34,5 @@ app.get("*", (req, res) =>
     })
 );
 
-// app.use((err, req, res, next) => {
-//     res.status(404).send({ error: err.message });
-// });
 
 module.exports = app;

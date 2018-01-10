@@ -6,7 +6,7 @@ module.exports.fetchUser = (req, res, next) =>{
         res.send(user.dataValues);
     });
 
-}
+};
 
 
  // { id: 6,

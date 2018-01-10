@@ -11,6 +11,7 @@ const fetchActivity = require("../controllers/activity").fetchActivity;
 const clickLikes = require("../controllers/activity").clickLikes;
 const fetchOneActivity = require("../controllers/activity").fetchOneActivity;
 const fetchUser = require("../controllers/user").fetchUser;
+const addRating = require("../controllers/rating").addRating;
 
 
 
@@ -27,4 +28,5 @@ module.exports = app => {
     app.post("/api/clickLikes/:activityId", requireAuth, clickLikes);
     app.get("/api/activity/:activityId", fetchOneActivity);
     app.get("/api/user/:userId", fetchUser);
+    app.post("/api/addRating", requireAuth, addRating);
 };

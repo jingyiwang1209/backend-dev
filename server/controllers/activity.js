@@ -34,7 +34,7 @@ module.exports.addActivity = (req, res, next) => {
                 images: imageURLs,
                 userId
             },
-            default: {
+            defaults: {
                 theme,
                 location,
                 departdate,
