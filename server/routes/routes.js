@@ -9,7 +9,8 @@ const fetchWish = require("../controllers/wish").fetchWish;
 const addActivity = require("../controllers/activity").addActivity;
 const fetchActivity = require("../controllers/activity").fetchActivity;
 const clickLikes = require("../controllers/activity").clickLikes;
-
+const fetchOneActivity = require("../controllers/activity").fetchOneActivity;
+const fetchUser = require("../controllers/user").fetchUser;
 
 
 
@@ -22,6 +23,8 @@ module.exports = app => {
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", requireAuth, fetchWish);
     app.post("/api/addActivity", requireAuth, addActivity);
-    app.get("/api/fetchActivity", requireAuth, fetchActivity);
+    app.get("/api/fetchActivity", fetchActivity);
     app.post("/api/clickLikes/:activityId", requireAuth, clickLikes);
+    app.get("/api/activity/:activityId", fetchOneActivity);
+    app.get("/api/user/:userId", fetchUser);
 };

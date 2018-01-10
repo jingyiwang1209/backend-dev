@@ -59,7 +59,7 @@ module.exports.addActivity = (req, res, next) => {
 
 module.exports.fetchActivity = (req, res, next) => {
     try {
-        let response = {};
+        let response = [];
         Activity.findAll().then(activities => {
             let length = activities.length;
             for (var i = 0; i < length; i++) {
@@ -79,8 +79,8 @@ module.exports.fetchActivity = (req, res, next) => {
                     .then(() => {
                         User.findById(userId).then(user => {
                             data.username = user.username;
-                            response[activityId] = data;
-                            if (Object.keys(response).length == length) {
+                            response.push(data);
+                            if (response.length == length) {
                                 res.send(response);
                             }
                         });
@@ -91,13 +91,32 @@ module.exports.fetchActivity = (req, res, next) => {
         next(e);
     }
 };
+
+module.exports.fetchOneActivity = (req, res, next) => {
+    const activityId = req.params.activityId;
+    let data;
+    Activity.findById(activityId)
+        .then(activity => {
+            data = activity.dataValues;
+        })
+        .then(() => {
+            User.findById(data.userId)
+                .then(user => {
+                    data.username = user.username;
+                })
+                .then(() => {
+                    res.send(data);
+                });
+        });
+};
+
 module.exports.clickLikes = (req, res, next) => {
     const userId = req.user.id;
-    // console.log("!!!userId", userId);
     const activityId = req.params.activityId;
-    // console.log("!!! activityId", activityId)
     const userMarker = userId + ";";
-    let result;
+
+    let result = {};
+
     ActivityLikes.findOrCreate({
         where: { activityId },
         defaults: {
@@ -106,8 +125,8 @@ module.exports.clickLikes = (req, res, next) => {
         }
     }).spread((activity, created) => {
         if (created) {
-            result = activity.numOfLikes;
-            res.send({ likes: result });
+            result[activityId] = activity.numOfLikes;
+            res.send(result);
         } else {
             if (activity.userMarkers.includes(userMarker)) {
                 activity
@@ -119,8 +138,8 @@ module.exports.clickLikes = (req, res, next) => {
                         numOfLikes: activity.numOfLikes - 1
                     })
                     .then(() => {
-                        result = activity.numOfLikes;
-                        res.send({ likes: result });
+                        result[activityId] = activity.numOfLikes;
+                        res.send(result);
                     });
             } else {
                 activity
@@ -129,8 +148,8 @@ module.exports.clickLikes = (req, res, next) => {
                         numOfLikes: activity.numOfLikes + 1
                     })
                     .then(() => {
-                        result = activity.numOfLikes;
-                        res.send({ likes: result });
+                        result[activityId] = activity.numOfLikes;
+                        res.send(result);
                     });
             }
         }
