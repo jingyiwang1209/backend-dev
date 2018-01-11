@@ -55,7 +55,7 @@ module.exports.fetchRatingSummary = (req, res, next) => {
             return denominator;
         })
         .then(denominator => {
-            Rating.sum('numOfStars')
+            Rating.sum('numOfStars', { where: { activityId }})
                 .then(nomerator => {
                     if (denominator == 0) {
                         statement["averageScore"] = 0;
@@ -64,7 +64,7 @@ module.exports.fetchRatingSummary = (req, res, next) => {
                     }
                 })
                 .then(() => {
-                    res.send(statement)
+                    res.send(statement);
                 });
         });
 };

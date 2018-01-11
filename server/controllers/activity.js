@@ -66,24 +66,41 @@ module.exports.fetchActivity = (req, res, next) => {
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;
-                ActivityLikes.findOrCreate({
-                    where: { activityId },
-                    defaults: {
-                        numOfLikes: 0,
-                        userMarkers: ""
-                    }
-                })
-                    .spread((activity, created) => {
-                        data.likes = activity.numOfLikes;
+                Rating.findAndCountAll({ where: { activityId } })
+                    .then(result => {
+                        data.numOfRater = result.count;
+                        return result.count;
+                    })
+                    .then(count => {
+                        if (count == 0) {
+                            data.averageScore = 0;
+                        } else {
+                            Rating.sum("numOfStars", {where:{activityId}}).then(sum => {
+                                data.averageScore = sum / count;
+                            });
+                        }
                     })
                     .then(() => {
-                        User.findById(userId).then(user => {
-                            data.username = user.username;
-                            response.push(data);
-                            if (response.length == length) {
-                                res.send(response);
+                        ActivityLikes.findOrCreate({
+                            where: { activityId },
+                            defaults: {
+                                numOfLikes: 0,
+                                userMarkers: ""
                             }
-                        });
+                        })
+                            .spread((activity, created) => {
+                                data.likes = activity.numOfLikes;
+                            })
+                            .then(() => {
+                                User.findById(userId).then(user => {
+                                    data.username = user.username;
+                                    console.log("!!!!!!!!", data)
+                                    response.push(data);
+                                    if (response.length == length) {
+                                        res.send(response);
+                                    }
+                                });
+                            });
                     });
             }
         });
