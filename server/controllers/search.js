@@ -6,9 +6,10 @@ module.exports.fetchSearchData = (req, res, next) => {
     // { location: '石家庄市 河北省', services: [ '徒步旅行' ] }
 
     let location = qs.parse(req.query).location;
-
     let category = qs.parse(req.query).category;
+
    console.log('backend', location,category)
+
     let data = [];
     if (category === "activity") {
         Activity.findAndCountAll({

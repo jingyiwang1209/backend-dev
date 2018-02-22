@@ -69,6 +69,34 @@ module.exports.fetchWish = (req, res, next) => {
     }
 };
 
+module.exports.fetchOneWish = (req, res, next) => {
+    const wishId = req.params.wishId;
+    let data;
+    Wish.findById(wishId)
+        .then(wish => {
+            data = wish.dataValues;
+        })
+        .then(() => {
+            User.findById(data.userId)
+                .then(user => {
+                    data.username = user.username;
+                })
+                .then(() => {
+                    res.send(data);
+                });
+        });
+};
+// { id: 3,
+//   location: '唐山市 河北省',
+//   departdate: '23 Feb 2018 11:15',
+//   finishdate: '01 Mar 2018 11:15',
+//   budget: '2000',
+//   services: [ '徒步旅行' ],
+//   createdAt: 2018-02-21T19:15:53.875Z,
+//   updatedAt: 2018-02-21T19:15:53.875Z,
+//   userId: 6,
+//   username: 'Robert' }
+
 module.exports.wishLikes = (req, res, next) => {
     try {
         const wishId = req.params.wishId;
