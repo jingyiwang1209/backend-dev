@@ -26,9 +26,9 @@ module.exports.addWish = (req, res, next) => {
             }
         }).spread((wish, created) => {
             if (!created) {
-                res.send("This wish is already created!");
+                res.send("你已经提交过同样的愿望了！");
             } else {
-                res.send("This wish is successfully created!");
+                res.send("愿望被成功创建！");
             }
         });
     } catch (e) {

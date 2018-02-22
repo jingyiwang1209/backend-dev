@@ -15,6 +15,7 @@ const fetchUser = require("../controllers/user").fetchUser;
 const addRating = require("../controllers/rating").addRating;
 const fetchRatings = require("../controllers/rating").fetchRatings;
 const fetchRatingSummary = require("../controllers/rating").fetchRatingSummary;
+const fetchSearchData = require("../controllers/search").fetchSearchData;
 
 
 
@@ -34,5 +35,6 @@ module.exports = app => {
     app.post("/api/addRating", requireAuth, addRating);
     app.get("/api/fetchRatings/:activityId", fetchRatings);
     app.get("/api/fetchRatingSummary/:activityId", fetchRatingSummary);
+    app.get("/api/searchData?:query", fetchSearchData);
     app.post("/api/sendWishLike/:wishId", requireAuth, wishLikes);
 };

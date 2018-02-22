@@ -47,9 +47,9 @@ module.exports.addActivity = (req, res, next) => {
             }
         }).spread((activity, created) => {
             if (!created) {
-                res.send("This activity is already created");
+                res.send("你已经提交过同样的活动了！");
             } else {
-                res.send("This activity is successfully created!");
+                res.send("活动被成功创建!");
             }
         });
     } catch (e) {
