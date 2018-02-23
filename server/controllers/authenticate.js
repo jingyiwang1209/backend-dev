@@ -1,12 +1,26 @@
 const User = require("../models").User;
 const jwt = require("jwt-simple");
 const keys = require("../config/keys");
-
+const qs = require("qs");
 const generateToken = user => {
     const timestamp = new Date().getTime();
     return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
 
+
+module.exports.verifySignupEmail = (req, res, next) =>{
+    let email = qs.parse(req.query).email;
+    User.findOne({
+        where: { mail : email}
+    }).then((user)=>{
+        if(user){
+            res.send(false);
+        }else{
+            res.send(true);
+        }
+    });
+
+};
 module.exports.signup = (req, res, next) => {
     try {
         const { email, password, username,sex,age,city,yearOfLiving,hometown,school,major,language,hobby,personality} = req.body
@@ -29,10 +43,8 @@ module.exports.signup = (req, res, next) => {
                 personality: personality
             }
         }).spread((user, created) => {
-            // console.log(user.get({plain:true}));
-            // console.log(created);
             if (!created) {
-                res.send({ error: "Email already in use!" });
+                res.send("该邮箱已经存在!");
             } else {
                 let token = generateToken(user);
                 res.send({ token });

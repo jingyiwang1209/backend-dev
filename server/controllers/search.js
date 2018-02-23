@@ -1,6 +1,9 @@
+const Sequelize = require('sequelize');
 const Activity = require("../models").Activity;
 const Wish = require("../models").Wish;
 const qs = require("qs");
+
+
 
 module.exports.fetchSearchData = (req, res, next) => {
     // { location: '石家庄市 河北省', services: [ '徒步旅行' ] }
@@ -31,13 +34,13 @@ module.exports.fetchSearchData = (req, res, next) => {
     } else if (category === "wish") {
         Wish.findAndCountAll({
             where: {
-                location: location
+                location: location,
             }
         })
             .then(result => {
                 result.rows.forEach(row => {
                     row.dataValues["counter"] = result.count;
-                    row.dataValues['category'] = "wish"
+                    row.dataValues['category'] = "wish";
                     data.push(row.dataValues);
                 });
             })
