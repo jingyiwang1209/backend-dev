@@ -7,7 +7,6 @@ const qs = require("qs");
 
 module.exports.fetchSearchData = (req, res, next) => {
     // { location: '石家庄市 河北省', services: [ '徒步旅行' ] }
-
     let location = qs.parse(req.query).location;
     let category = qs.parse(req.query).category;
 
@@ -63,6 +62,8 @@ module.exports.fetchSearchData = (req, res, next) => {
 //     createdAt: 2018-02-21T02:18:16.284Z,
 //     updatedAt: 2018-02-21T02:18:16.284Z,
 //     userId: 6,
-//     counter: 1 } ]
+//     counter: 1,
+ //    category:"wish"
+ // } ]
 
 // return [] if not found

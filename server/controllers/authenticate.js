@@ -47,7 +47,7 @@ module.exports.signup = (req, res, next) => {
                 res.send("该邮箱已经存在!");
             } else {
                 let token = generateToken(user);
-                res.send({ token });
+                res.send({ token, user:user.dataValues});
             }
         });
     } catch (e) {
@@ -56,5 +56,6 @@ module.exports.signup = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-    res.send({ token:generateToken(req.user)});
+    let user = req.user.dataValues;
+    res.send({ token:generateToken(req.user), user});
 };

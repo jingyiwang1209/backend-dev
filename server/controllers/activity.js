@@ -57,6 +57,7 @@ module.exports.addActivity = (req, res, next) => {
     }
 };
 
+// Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
     try {
         let response = [];
