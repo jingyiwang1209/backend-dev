@@ -61,7 +61,7 @@ module.exports.fetchRatingSummary = (req, res, next) => {
                     if (denominator == 0) {
                         statement["averageScore"] = 0;
                     } else {
-                        statement["averageScore"] = nomerator / denominator;
+                        statement["averageScore"] = Math.floor((nomerator / denominator) * 10) / 10;
                     }
                 })
                 .then(() => {

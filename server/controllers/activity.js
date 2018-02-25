@@ -77,7 +77,7 @@ module.exports.fetchActivity = (req, res, next) => {
                             data.averageScore = 0;
                         } else {
                             Rating.sum("numOfStars", {where:{activityId}}).then(sum => {
-                                data.averageScore = sum / count;
+                                data.averageScore = Math.floor((sum / count) * 10) / 10;
                             });
                         }
                     })
@@ -95,7 +95,6 @@ module.exports.fetchActivity = (req, res, next) => {
                             .then(() => {
                                 User.findById(userId).then(user => {
                                     data.username = user.username;
-                                    console.log("!!!!!!!!", data)
                                     response.push(data);
                                     if (response.length == length) {
                                         res.send(response);
