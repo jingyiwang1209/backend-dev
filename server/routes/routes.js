@@ -32,7 +32,7 @@ module.exports = app => {
     app.get("/api/verifySignupEmail?:query", verifySignupEmail);
     app.post("/api/signup", signupController);
     app.post("/api/login", requireLogin, loginController);
-    app.post("/api/updateBasicInfo/:userId", requireAuth, updateBasic);
+    app.post("/api/updateBasicInfo", requireAuth, updateBasic);
 
 
     app.post("/api/addWish", requireAuth, addWish);
