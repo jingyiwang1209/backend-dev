@@ -72,11 +72,10 @@ module.exports.login = (req, res, next) => {
     res.send({ token: generateToken(req.user), user });
 };
 
-
 module.exports.updateBasic = (req, res, next) => {
     const userId = req.params.userId;
     const updates = req.body;
-    console.log("updatesdata", updates)
+    console.log("updatesdata", updates);
     // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
     let { key, value } = updates;
     if (key === "mail") {
@@ -86,8 +85,8 @@ module.exports.updateBasic = (req, res, next) => {
             }
         }).then(result => {
             if (result) {
-                console.log("该邮箱已经被他人使用");
-                res.send("该邮箱已经被他人使用");
+                console.log(value+" 已被使用");
+                res.send(value+" 已被使用");
             } else {
                 User.update(
                     {
@@ -98,16 +97,14 @@ module.exports.updateBasic = (req, res, next) => {
                             id: userId
                         }
                     }
-                ).then((updatedUser)=>{
-                     // [1]
-                     // console.log(key,value)
-                     res.send([key, value])
-
+                ).then(updatedUser => {
+                    // [1]
+                    // console.log(key,value)
+                    res.send([key, value]);
                 });
             }
         });
     } else {
-
         User.update(
             {
                 [key]: value
@@ -117,10 +114,10 @@ module.exports.updateBasic = (req, res, next) => {
                     id: userId
                 }
             }
-        ).then((updatedUser)=>{
+        ).then(updatedUser => {
             // [1]
             // console.log(updatedUser, key, value)
-           res.send([key, value]);
+            res.send([key, value]);
         });
     }
 };
