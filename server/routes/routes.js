@@ -3,6 +3,7 @@ const passport = require("passport");
 
 const signupController = require("../controllers/authenticate").signup;
 const verifySignupEmail = require("../controllers/authenticate").verifySignupEmail;
+const updateBasic = require("../controllers/authenticate").updateBasic;
 
 
 const loginController = require("../controllers/authenticate").login;
@@ -31,6 +32,9 @@ module.exports = app => {
     app.get("/api/verifySignupEmail?:query", verifySignupEmail);
     app.post("/api/signup", signupController);
     app.post("/api/login", requireLogin, loginController);
+    app.post("/api/updateBasicInfo/:userId", updateBasic);
+
+
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", fetchWish);
     app.post("/api/addActivity", requireAuth, addActivity);

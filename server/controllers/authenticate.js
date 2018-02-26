@@ -7,23 +7,35 @@ const generateToken = user => {
     return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
 
-
-module.exports.verifySignupEmail = (req, res, next) =>{
+module.exports.verifySignupEmail = (req, res, next) => {
     let email = qs.parse(req.query).email;
     User.findOne({
-        where: { mail : email}
-    }).then((user)=>{
-        if(user){
+        where: { mail: email }
+    }).then(user => {
+        if (user) {
             res.send(false);
-        }else{
+        } else {
             res.send(true);
         }
     });
-
 };
 module.exports.signup = (req, res, next) => {
     try {
-        const { email, password, username,sex,age,city,yearOfLiving,hometown,school,major,language,hobby,personality} = req.body
+        const {
+            email,
+            password,
+            username,
+            sex,
+            age,
+            city,
+            yearOfLiving,
+            hometown,
+            school,
+            major,
+            language,
+            hobby,
+            personality
+        } = req.body;
 
         User.findOrCreate({
             where: { mail: email },
@@ -47,7 +59,7 @@ module.exports.signup = (req, res, next) => {
                 res.send("该邮箱已经存在!");
             } else {
                 let token = generateToken(user);
-                res.send({ token, user:user.dataValues});
+                res.send({ token, user: user.dataValues });
             }
         });
     } catch (e) {
@@ -57,5 +69,58 @@ module.exports.signup = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
     let user = req.user.dataValues;
-    res.send({ token:generateToken(req.user), user});
+    res.send({ token: generateToken(req.user), user });
+};
+
+
+module.exports.updateBasic = (req, res, next) => {
+    const userId = req.params.userId;
+    const updates = req.body;
+    console.log("updatesdata", updates)
+    // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
+    let { key, value } = updates;
+    if (key === "mail") {
+        User.findOne({
+            where: {
+                mail: value
+            }
+        }).then(result => {
+            if (result) {
+                console.log("该邮箱已经被他人使用");
+                res.send("该邮箱已经被他人使用");
+            } else {
+                User.update(
+                    {
+                        mail: value
+                    },
+                    {
+                        where: {
+                            id: userId
+                        }
+                    }
+                ).then((updatedUser)=>{
+                     // [1]
+                     // console.log(key,value)
+                     res.send([key, value])
+
+                });
+            }
+        });
+    } else {
+
+        User.update(
+            {
+                [key]: value
+            },
+            {
+                where: {
+                    id: userId
+                }
+            }
+        ).then((updatedUser)=>{
+            // [1]
+            // console.log(updatedUser, key, value)
+           res.send([key, value]);
+        });
+    }
 };
