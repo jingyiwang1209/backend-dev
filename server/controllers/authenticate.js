@@ -74,23 +74,23 @@ module.exports.login = (req, res, next) => {
 
 module.exports.updateBasic = (req, res, next) => {
     // get user from passport
-   // req.user:
-  //    { id: 6,
-  // mail: 'robert@gmail.com',
-  // password: '$2a$10$bqeLmIeOYu/prAGamSP0s.cIuLyVpktpqdeCsXCa0KVpRASQhzFlW',
-  // username: '哥斯拉',
-  // sex: '男',
-  // age: 40,
-  // city: 'San Francisco',
-  // yearOfLiving: 15,
-  // hometown: '旧金山',
-  // school: '加大伯克利分校',
-  // major: '机械工程，材料科学',
-  // language: '良好',
-  // hobby: '汽车',
-  // personality: '快乐',
-  // createdAt: 2018-01-02T06:43:37.753Z,
-  // updatedAt: 2018-02-26T21:00:40.142Z }
+    // req.user:
+    //    { id: 6,
+    // mail: 'robert@gmail.com',
+    // password: '$2a$10$bqeLmIeOYu/prAGamSP0s.cIuLyVpktpqdeCsXCa0KVpRASQhzFlW',
+    // username: '哥斯拉',
+    // sex: '男',
+    // age: 40,
+    // city: 'San Francisco',
+    // yearOfLiving: 15,
+    // hometown: '旧金山',
+    // school: '加大伯克利分校',
+    // major: '机械工程，材料科学',
+    // language: '良好',
+    // hobby: '汽车',
+    // personality: '快乐',
+    // createdAt: 2018-01-02T06:43:37.753Z,
+    // updatedAt: 2018-02-26T21:00:40.142Z }
     const userId = req.user.id;
     const updates = req.body;
     console.log("updatesdata", updates);
@@ -101,27 +101,31 @@ module.exports.updateBasic = (req, res, next) => {
             where: {
                 mail: value
             }
-        }).then(result => {
-            if (result) {
-                console.log(value+" 已被使用");
-                res.send(value+" 已被使用");
-            } else {
-                User.update(
-                    {
-                        mail: value
-                    },
-                    {
-                        where: {
-                            id: userId
+        })
+            .then(result => {
+                if (result) {
+                    console.log(value + " 已被使用");
+                    res.send(value + " 已被使用");
+                } else {
+                    User.update(
+                        {
+                            mail: value
+                        },
+                        {
+                            where: {
+                                id: userId
+                            }
                         }
-                    }
-                ).then(updatedUser => {
-                    // [1]
-                    // console.log(key,value)
-                    res.send([key, value]);
-                });
-            }
-        });
+                    ).then(updatedUser => {
+                        // [1]
+                        // console.log(key,value)
+                        res.send([key, value]);
+                    });
+                }
+            })
+            .catch(e => {
+                next(e);
+            });
     } else {
         User.update(
             {
@@ -132,10 +136,14 @@ module.exports.updateBasic = (req, res, next) => {
                     id: userId
                 }
             }
-        ).then(updatedUser => {
-            // [1]
-            // console.log(updatedUser, key, value)
-            res.send([key, value]);
-        });
+        )
+            .then(updatedUser => {
+                // [1]
+                // console.log(updatedUser, key, value)
+                res.send([key, value]);
+            })
+            .catch(e => {
+                next(e);
+            });
     }
 };
