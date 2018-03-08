@@ -103,27 +103,41 @@ module.exports.fetchUserActivities = (req, res, next) => {
 //   userId: 9 }
 
 module.exports.fetchActivityForEditting = (req, res, next) => {
-        const id = req.user.id;
-        const { activityId } = req.params;
-        if (Number.isNaN(parseInt(activityId))) {
-            return null;
-        }
-        Activity.findById(activityId).then(result => {
+    const id = req.user.id;
+    const { activityId } = req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        return null;
+    }
+    Activity.findById(activityId)
+        .then(result => {
             // make sure the current logged user is the one who created the activity
-            if(result.dataValues.userId === req.user.id){
+            if (result.dataValues.userId === req.user.id) {
                 res.send(result.dataValues);
-            }else{
+            } else {
                 // res.send({})
-                return null
+                return null;
             }
-        }).catch((e)=> next(e))
-
-
+        })
+        .catch(e => next(e));
 };
 
-module.exports.updateUserActivity = (req, res, next)=>{
+module.exports.updateUserActivity = (req, res, next) => {
+    const activityId = req.params.activityId;
+    const edittedValues = req.body;
+    // 7 { services: [ '徒步旅行', '汽车接送' ] }
+    console.log("edittedValues", edittedValues)
 
-}
+    Activity.update(
+        edittedValues,
+        {
+            where: {
+                id: activityId
+            }
+        }
+    ).then((result)=>{
+       console.log("done", result)
+    })
+};
 
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {

@@ -39,7 +39,7 @@ module.exports = app => {
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
     app.get("/api/activities/:userId", fetchUserActivities)
     app.get("/api/editActivity/:activityId", requireAuth, fetchActivityForEditting)
-    // app.post("/api/", requireAuth, updateUserActivity)
+    app.post("/api/updateUserActivity/:activityId", requireAuth, updateUserActivity)
 
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", fetchWish);
