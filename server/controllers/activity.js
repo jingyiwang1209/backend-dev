@@ -114,7 +114,7 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result.dataValues.userId === req.user.id) {
                 res.send(result.dataValues);
             } else {
-                // res.send({})
+                res.send("你没有该权限或者此页已经被删除")
                 return null;
             }
         })
@@ -125,7 +125,7 @@ module.exports.updateUserActivity = (req, res, next) => {
     const activityId = req.params.activityId;
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
-    console.log("edittedValues", edittedValues)
+    // console.log("edittedValues", edittedValues)
 
     Activity.update(
         edittedValues,
@@ -135,10 +135,30 @@ module.exports.updateUserActivity = (req, res, next) => {
             }
         }
     ).then((result)=>{
-       console.log("done", result)
+        // [1]
+        if(result[0] === 1){
+            res.send("修改成功！")
+        }
     })
 };
 
+module.exports.deleteUserActivity = (req, res, next) =>{
+    const activityId = req.params.activityId;
+    // console.log("deletedId", activityId)
+    Activity.destroy({
+        where:{
+            id:activityId
+        }
+    }).then((result)=>{
+        if(result === 1){
+            res.send("成功删除该活动")
+        }else{
+            res.send("该活动不存在")
+        }
+    }).catch((e)=>{
+        next(e)
+    })
+}
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
     try {
