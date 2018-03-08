@@ -110,12 +110,15 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
     }
     Activity.findById(activityId)
         .then(result => {
-            // make sure the current logged user is the one who created the activity
-            if (result.dataValues.userId === req.user.id) {
-                res.send(result.dataValues);
+            if (result) {
+                // make sure the current logged user is the one who created the activity
+                if (result.dataValues.userId === req.user.id) {
+                    res.send(result.dataValues);
+                } else {
+                    res.send({ warning: "你没有权限修改此活动" });
+                }
             } else {
-                res.send("你没有该权限或者此页已经被删除")
-                return null;
+                res.send({ warning: "此活动不存在" });
             }
         })
         .catch(e => next(e));
@@ -123,42 +126,61 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
 
 module.exports.updateUserActivity = (req, res, next) => {
     const activityId = req.params.activityId;
+    const userId = req.user.id;
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
     // console.log("edittedValues", edittedValues)
 
-    Activity.update(
-        edittedValues,
-        {
-            where: {
-                id: activityId
-            }
-        }
-    ).then((result)=>{
-        // [1]
-        if(result[0] === 1){
-            res.send("修改成功！")
+    Activity.update(edittedValues, {
+        where: {
+            id: activityId,
+            userId
         }
     })
+        .then(result => {
+            // [1]
+            if (result) {
+                if (result[0] === 1) {
+                    res.send("修改成功！");
+                } else {
+                    res.send("修改失败");
+                }
+            } else {
+                res.send("你没有权限");
+            }
+        })
+        .catch(e => {
+            next(e);
+        });
 };
 
-module.exports.deleteUserActivity = (req, res, next) =>{
+module.exports.deleteUserActivity = (req, res, next) => {
     const activityId = req.params.activityId;
     // console.log("deletedId", activityId)
+    const userId = req.user.id;
     Activity.destroy({
-        where:{
-            id:activityId
+        where: {
+            id: activityId,
+            userId
         }
-    }).then((result)=>{
-        if(result === 1){
-            res.send("成功删除该活动")
-        }else{
-            res.send("该活动不存在")
-        }
-    }).catch((e)=>{
-        next(e)
     })
-}
+        .then(result => {
+            // console.log("Result",result)
+            if (result >= 0) {
+                if (result === 1) {
+                    res.send("成功删除该活动");
+                } else {
+                    // result === 0
+                    res.send("该活动不存在");
+                }
+            }else{
+                res.send("你没有权限")
+            }
+        })
+        .catch(e => {
+            next(e);
+        });
+};
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
     try {
