@@ -18,6 +18,8 @@ const fetchOneActivity = require("../controllers/activity").fetchOneActivity;
 const fetchOneWish = require("../controllers/wish").fetchOneWish;
 
 const fetchUser = require("../controllers/user").fetchUser;
+const fetchUserActivities = require("../controllers/activity").fetchUserActivities;
+
 const addRating = require("../controllers/rating").addRating;
 const fetchRatings = require("../controllers/rating").fetchRatings;
 const fetchRatingSummary = require("../controllers/rating").fetchRatingSummary;
@@ -33,7 +35,7 @@ module.exports = app => {
     app.post("/api/signup", signupController);
     app.post("/api/login", requireLogin, loginController);
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
-
+    app.get("/api/activities/:userId", fetchUserActivities)
 
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", fetchWish);
