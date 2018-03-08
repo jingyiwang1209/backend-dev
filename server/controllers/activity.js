@@ -60,6 +60,8 @@ module.exports.addActivity = (req, res, next) => {
 module.exports.fetchUserActivities = (req, res, next) => {
     const userId = req.params.userId;
     if (Number.isNaN(parseInt(userId))) {
+        res.send(["输入地址无效"]);
+        res.end();
         return null;
     }
     let data = [];
@@ -67,11 +69,21 @@ module.exports.fetchUserActivities = (req, res, next) => {
         where: { userId }
     })
         .then(result => {
-            for (let i = 0; i < result.length; i++) {
-                data.push(result[i].dataValues);
+            if (result && result.length > 0) {
+                for (let i = 0; i < result.length; i++) {
+                    data.push(result[i].dataValues);
+                    return data;
+                }
+            } else {
+                res.send(["该用户不存在"]);
+                res.end();
+                return null;
             }
         })
-        .then(() => {
+        .then(prevResult => {
+            if (!prevResult) {
+                return null;
+            }
             // console.log(data)
             //     [ { id: 7,
             // theme: '大连城市风光游',
@@ -86,7 +98,8 @@ module.exports.fetchUserActivities = (req, res, next) => {
             // updatedAt: 2018-02-21T02:18:16.284Z,
             // userId: 6 } ]
             res.send(data);
-        });
+        })
+        .catch(e => next(e));
 };
 
 // { id: 12,
@@ -106,6 +119,8 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
     const id = req.user.id;
     const { activityId } = req.params;
     if (Number.isNaN(parseInt(activityId))) {
+        res.send({ warning: "输入地址无效" });
+        res.end();
         return null;
     }
     Activity.findById(activityId)
@@ -130,6 +145,11 @@ module.exports.updateUserActivity = (req, res, next) => {
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
     // console.log("edittedValues", edittedValues)
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send("输入地址无效");
+        res.end();
+        return null;
+    }
 
     Activity.update(edittedValues, {
         where: {
@@ -139,14 +159,14 @@ module.exports.updateUserActivity = (req, res, next) => {
     })
         .then(result => {
             // [1]
-            if (result) {
+            if (result && result.length > 0) {
                 if (result[0] === 1) {
                     res.send("修改成功！");
                 } else {
                     res.send("修改失败");
                 }
             } else {
-                res.send("你没有权限");
+                res.send("该活动不存在或者你没有修改权限!");
             }
         })
         .catch(e => {
@@ -157,6 +177,11 @@ module.exports.updateUserActivity = (req, res, next) => {
 module.exports.deleteUserActivity = (req, res, next) => {
     const activityId = req.params.activityId;
     // console.log("deletedId", activityId)
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send("输入地址无效");
+        res.end();
+        return null;
+    }
     const userId = req.user.id;
     Activity.destroy({
         where: {
@@ -173,8 +198,8 @@ module.exports.deleteUserActivity = (req, res, next) => {
                     // result === 0
                     res.send("该活动不存在");
                 }
-            }else{
-                res.send("你没有权限")
+            } else {
+                res.send("你没有权限");
             }
         })
         .catch(e => {
@@ -183,9 +208,9 @@ module.exports.deleteUserActivity = (req, res, next) => {
 };
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
-    try {
-        let response = [];
-        Activity.findAll().then(activities => {
+    let response = [];
+    Activity.findAll()
+        .then(activities => {
             let length = activities.length;
             for (var i = 0; i < length; i++) {
                 const data = activities[i].dataValues;
@@ -220,30 +245,48 @@ module.exports.fetchActivity = (req, res, next) => {
                                 data.likes = activity.numOfLikes;
                             })
                             .then(() => {
-                                User.findById(userId).then(user => {
-                                    data.username = user.username;
-                                    response.push(data);
-                                    if (response.length == length) {
-                                        res.send(response);
-                                    }
-                                });
-                            });
-                    });
+                                User.findById(userId)
+                                    .then(user => {
+                                        data.username = user.username;
+                                        response.push(data);
+                                        if (response.length == length) {
+                                            res.send(response);
+                                        }
+                                    })
+                                    .catch(e => next(e));
+                            })
+                            .catch(e => next(e));
+                    })
+                    .catch(e => next(e));
             }
-        });
-    } catch (e) {
-        next(e);
-    }
+        })
+        .catch(e => next(e));
 };
 
 module.exports.fetchOneActivity = (req, res, next) => {
-    const activityId = req.params.activityId;
+    const { activityId } = req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send({ warning: "输入地址无效" });
+        res.end();
+        return null;
+    }
+
     let data;
     Activity.findById(activityId)
         .then(activity => {
-            data = activity.dataValues;
+            if (activity) {
+                data = activity.dataValues;
+                return data;
+            } else {
+                res.send({ warning: "该活动不存在" });
+                res.end();
+                return null;
+            }
         })
-        .then(() => {
+        .then(prevResult => {
+            if (!prevResult) {
+                return null;
+            }
             User.findById(data.userId)
                 .then(user => {
                     data.username = user.username;
@@ -251,12 +294,18 @@ module.exports.fetchOneActivity = (req, res, next) => {
                 .then(() => {
                     res.send(data);
                 });
-        });
+        })
+        .catch(e => next(e));
 };
 
 module.exports.clickLikes = (req, res, next) => {
     const userId = req.user.id;
-    const activityId = req.params.activityId;
+    const { activityId } = req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send({ warning: "输入地址无效" });
+        res.end();
+        return null;
+    }
     const userMarker = userId + ";";
 
     let result = {};

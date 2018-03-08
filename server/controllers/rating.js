@@ -29,7 +29,12 @@ module.exports.addRating = (req, res, next) => {
 // { userId, numOfStars,feedback}
 
 module.exports.fetchRatings = (req, res, next) => {
-    const activityId = req.params.activityId;
+    const { activityId }= req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send(["输入地址无效"]);
+        res.end();
+        return null;
+    }
     const data = [];
     Rating.findAll({
         where: { activityId },
@@ -48,7 +53,12 @@ module.exports.fetchRatings = (req, res, next) => {
 };
 
 module.exports.fetchRatingSummary = (req, res, next) => {
-    const activityId = req.params.activityId;
+    const { activityId } = req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send(["输入地址无效"]);
+        res.end();
+        return null;
+    }
     const statement = {};
     Rating.count({ where: {activityId} })
         .then(denominator => {

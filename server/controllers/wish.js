@@ -3,47 +3,46 @@ const User = require("../models").User;
 const WishLikes = require("../models").WishLikes;
 
 module.exports.addWish = (req, res, next) => {
-    try {
-        const { location, departdate, finishdate, budget, services } = req.body;
-        const userId = req.user.id;
-        console.log("userId", userId);
-        Wish.findOrCreate({
-            where: {
-                location,
-                departdate,
-                finishdate,
-                budget,
-                services,
-                userId
-            },
-            defaults: {
-                location,
-                departdate,
-                finishdate,
-                budget,
-                services,
-                userId
-            }
-        }).spread((wish, created) => {
+    const { location, departdate, finishdate, budget, services } = req.body;
+    const userId = req.user.id;
+    // console.log("userId", userId);
+    Wish.findOrCreate({
+        where: {
+            location,
+            departdate,
+            finishdate,
+            budget,
+            services,
+            userId
+        },
+        defaults: {
+            location,
+            departdate,
+            finishdate,
+            budget,
+            services,
+            userId
+        }
+    })
+        .spread((wish, created) => {
             if (!created) {
                 res.send("你已经提交过同样的愿望了！");
             } else {
                 res.send("愿望被成功创建！");
             }
-        });
-    } catch (e) {
-        next(e);
-    }
+        })
+        .catch(e => next(e));
 };
 
 module.exports.fetchWish = (req, res, next) => {
     const data = [];
-    try {
-        Wish.findAll().then(wishes => {
+
+    Wish.findAll()
+        .then(wishes => {
             const length = wishes.length;
             for (var i = 0; i < wishes.length; i++) {
                 let wish = wishes[i].dataValues;
-                console.log("wish", wish);
+                // console.log("wish", wish);
                 let wishId = wish.id;
                 WishLikes.findOrCreate({
                     where: { wishId },
@@ -63,20 +62,34 @@ module.exports.fetchWish = (req, res, next) => {
                         }
                     });
             }
-        });
-    } catch (e) {
-        next(e);
-    }
+        })
+        .catch(e => next(e));
 };
 
 module.exports.fetchOneWish = (req, res, next) => {
-    const wishId = req.params.wishId;
+    const { wishId } = req.params;
+    if (Number.isNaN(parseInt(wishId))) {
+        res.send({ warning: "输入地址无效" });
+        res.end();
+        return null;
+    }
     let data;
     Wish.findById(wishId)
         .then(wish => {
-            data = wish.dataValues;
+            if (wish) {
+                data = wish.dataValues;
+                return data;
+            } else {
+                res.send({ warning: "该愿望不存在" });
+                res.end();
+                return null;
+            }
         })
-        .then(() => {
+        .then(prevResult => {
+            if (!prevResult) {
+                res.end();
+                return null;
+            }
             User.findById(data.userId)
                 .then(user => {
                     data.username = user.username;
@@ -98,33 +111,38 @@ module.exports.fetchOneWish = (req, res, next) => {
 //   username: 'Robert' }
 
 module.exports.wishLikes = (req, res, next) => {
-    try {
-        const wishId = req.params.wishId;
-        const userId = req.user.id;
-        const userMarker = userId + ";";
-        const result={};
-        WishLikes.findOne({ where: { wishId }}).then(wishLike => {
-            if (wishLike.userMarkers.includes(userMarker)) {
-                wishLike.update({
+    const { wishId } = req.params;
+    if (Number.isNaN(parseInt(wishId))) {
+        res.send({ warning: "输入地址无效" });
+        res.end();
+        return null;
+    }
+    const userId = req.user.id;
+    const userMarker = userId + ";";
+    const result = {};
+    WishLikes.findOne({ where: { wishId } }).then(wishLike => {
+        if (wishLike.userMarkers.includes(userMarker)) {
+            wishLike
+                .update({
                     userMarkers: wishLike.userMarkers.replace(userMarker, ""),
                     numOfLikes: wishLike.numOfLikes - 1
-                }).then(()=>{
+                })
+                .then(() => {
                     result[wishId] = wishLike.numOfLikes;
                     console.log(result);
                     res.send(result);
                 });
-            }else{
-                wishLike.update({
-                    userMarkers:wishLike.userMarkers + userMarker,
-                    numOfLikes:wishLike.numOfLikes + 1
-                }).then(()=>{
+        } else {
+            wishLike
+                .update({
+                    userMarkers: wishLike.userMarkers + userMarker,
+                    numOfLikes: wishLike.numOfLikes + 1
+                })
+                .then(() => {
                     result[wishId] = wishLike.numOfLikes;
                     console.log(result);
                     res.send(result);
                 });
-            }
-        });
-    } catch (e) {
-        next(e);
-    }
+        }
+    }).catch((e)=>next(e))
 };
