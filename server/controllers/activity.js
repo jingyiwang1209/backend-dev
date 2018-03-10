@@ -4,6 +4,33 @@ const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
 
+module.exports.verifyYourFev = (req, res, next) =>{
+    const userId = req.user.id;
+    const { activityId } = req.params;
+    if (Number.isNaN(parseInt(activityId))) {
+        res.send(["输入地址无效"]);
+        res.end();
+        return null;
+    }
+
+    Favorite.findOne({
+        where:{
+            userId
+        }
+    }).then((fav)=>{
+        if(!fav || fav.favorites.length === 0){
+            res.send(false);
+        }else{
+            if(fav.favorites.includes(+activityId)){
+                res.send(true);
+            }else{
+                res.send(false);
+            }
+        }
+    });
+
+};
+
 module.exports.addActivity = (req, res, next) => {
     try {
         const images = req.body.images;
