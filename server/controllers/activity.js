@@ -168,7 +168,7 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
 };
 
 module.exports.updateUserActivity = (req, res, next) => {
-    const activityId = req.params.activityId;
+    const { activityId } = req.params;
     const userId = req.user.id;
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
@@ -240,7 +240,7 @@ module.exports.fetchActivity = (req, res, next) => {
     Activity.findAll()
         .then(activities => {
             let length = activities.length;
-            for (var i = 0; i < length; i++) {
+            for (let i = 0; i < length; i++) {
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;

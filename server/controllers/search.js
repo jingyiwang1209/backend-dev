@@ -22,7 +22,7 @@ module.exports.fetchSearchData = (req, res, next) => {
             .then(result => {
                 result.rows.forEach(row => {
                     row.dataValues["counter"] = result.count;
-                    row.dataValues['category'] = "activity"
+                    row.dataValues['category'] = "activity";
                     data.push(row.dataValues);
                 });
             })

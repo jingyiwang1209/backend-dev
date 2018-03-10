@@ -1,11 +1,14 @@
 const Activity = require("../models").Activity;
 const User = require("../models").User;
 const Favorite = require("../models").Favorite;
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 module.exports.fetchUserFavorites = (req, res, next) => {
     // user must be logged in to get his/her favorites
     const userId = req.user.id;
     // console.log("userid", userId)
+    let data = [];
     Favorite.findOne({
         where: {
             userId
@@ -18,22 +21,25 @@ module.exports.fetchUserFavorites = (req, res, next) => {
                 });
                 res.end();
             } else {
-                let data = [];
-                for (let i = 0; i < favorite.favorites.length; i++) {
-                    Activity.findById(favorite.favorites[i]).then(result => {
-                        if (!result) {
-                            res.send({ warning: "活动已经不存在" });
-                            res.end();
-                        } else {
-                            data.push(result.dataValues);
-                            if (data.length === favorite.favorites.length) {
-                                // console.log("finalData",data);
-                                res.send(data);
-                                return null;
-                            }
+
+                Activity.findAll({
+                    where: {
+                        id: {
+                            [Op.or]: favorite.favorites
                         }
-                    });
-                }
+                    }
+                }).then(favs => {
+                    // in case the activity is deleted by its creator
+                    if(favs.length > 0){
+                       favs.forEach((fav)=>{
+                            data.push(fav.dataValues);
+
+                        });
+                       res.send(data);
+                    }else{
+                        res.send({warning:"活动已经不存在"});
+                    }
+                });
             }
         })
         .catch(e => {
