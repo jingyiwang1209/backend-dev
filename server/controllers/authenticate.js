@@ -93,57 +93,43 @@ module.exports.updateBasic = (req, res, next) => {
     // updatedAt: 2018-02-26T21:00:40.142Z }
     const userId = req.user.id;
     const updates = req.body;
-    console.log("updatesdata", updates);
+    // console.log("updatesdata", updates);
     // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
     let { key, value } = updates;
-    if (key === "mail") {
-        User.findOne({
-            where: {
-                mail: value
-            }
-        })
-            .then(result => {
-                if (result) {
-                    console.log(value + " 已被使用");
-                    res.send(value + " 已被使用");
-                } else {
-                    User.update(
-                        {
-                            mail: value
-                        },
-                        {
-                            where: {
-                                id: userId
-                            }
-                        }
-                    ).then(updatedUser => {
+    User.findById(userId).then(user => {
+        if (!user) {
+            res.send("该用户不存在");
+        } else {
+            if (key === "mail") {
+                User.findOne({
+                    where: {
+                        mail: value
+                    }
+                }).then(result => {
+                    if (result) {
+                        res.send(value + "已被使用");
+                    } else {
+                        // console.log("user!!!!", user);
+                        user
+                            .update({
+                                mail: value
+                            })
+                            .then(updatedUser => {
+                                // [1]
+                                res.send([key, value]);
+                            });
+                    }
+                });
+            } else {
+                user
+                    .update({
+                        [key]: value
+                    })
+                    .then(updatedUser => {
                         // [1]
-                        // console.log(key,value)
                         res.send([key, value]);
                     });
-                }
-            })
-            .catch(e => {
-                next(e);
-            });
-    } else {
-        User.update(
-            {
-                [key]: value
-            },
-            {
-                where: {
-                    id: userId
-                }
             }
-        )
-            .then(updatedUser => {
-                // [1]
-                // console.log(updatedUser, key, value)
-                res.send([key, value]);
-            })
-            .catch(e => {
-                next(e);
-            });
-    }
+        }
+    });
 };

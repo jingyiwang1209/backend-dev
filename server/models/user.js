@@ -3,7 +3,6 @@
 const bcrypt = require("bcrypt-nodejs");
 
 module.exports = (sequelize, DataTypes) => {
-
   const User = sequelize.define("User", {
     mail: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
@@ -21,10 +20,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.associate = function(models) {
-     User.hasMany(models.Activity, {
-      foreignKey: 'userId',
-      as:'activities'
-     });
+    User.hasMany(models.Activity, {
+      foreignKey: "userId",
+      as: "activities"
+    });
   };
 
   User.prototype.cryptPassword = function(password) {
@@ -42,11 +41,11 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   User.prototype.comparePassword = function(candidatePassword) {
-    let password=this.password;
+    let password = this.password;
     return new Promise(function(resolve, reject) {
-      bcrypt.compare(candidatePassword, password, function(err, res){
-         if(err) reject(err);
-         resolve(res);
+      bcrypt.compare(candidatePassword, password, function(err, res) {
+        if (err) reject(err);
+        resolve(res);
       });
     });
   };
@@ -62,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
       });
   });
 
-  User.beforeUpdate((user, options)=>{
+  User.beforeUpdate((user, options) => {
     return user
       .cryptPassword(user.password)
       .then(success => {
@@ -71,6 +70,7 @@ module.exports = (sequelize, DataTypes) => {
       .catch(err => {
         if (err) console.log(err);
       });
-    })
+  });
+
   return User;
 };
