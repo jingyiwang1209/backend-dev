@@ -2,6 +2,7 @@ const Activity = require("../models").Activity;
 const User = require("../models").User;
 const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
+const Favorite = require("../models").Favorite;
 
 module.exports.addActivity = (req, res, next) => {
     try {
@@ -346,5 +347,33 @@ module.exports.clickLikes = (req, res, next) => {
                     });
             }
         }
+    });
+
+    // Add the activity to user's favorite
+    // const userId = req.user.id;
+    // const { activityId } = req.params;
+    // id | favorites | createdAt | updatedAt | userId
+    // !!!!!!!activityId is string!!!!!!
+    Favorite.findOrCreate({
+        where: {
+            userId
+        },
+        defaults: {
+            favorites: [+activityId]
+        }
+    }).spread((favorite, created) => {
+        if (!created) {
+            if (favorite.favorites.includes(+activityId)) {
+                let index = favorite.favorites.indexOf(+activityId);
+                favorite.favorites.pop(index);
+            } else {
+                favorite.favorites.push(+activityId);
+            }
+        }
+        favorite.update({
+            favorites: favorite.favorites
+        });
+        console.log(favorite.favorites)
+        //  [] or [15,4,2]
     });
 };

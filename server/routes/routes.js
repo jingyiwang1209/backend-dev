@@ -22,6 +22,8 @@ const fetchUserActivities = require("../controllers/activity").fetchUserActiviti
 const fetchActivityForEditting = require("../controllers/activity").fetchActivityForEditting;
 const updateUserActivity = require("../controllers/activity").updateUserActivity;
 const deleteUserActivity = require("../controllers/activity").deleteUserActivity
+const fetchUserFavorites = require("../controllers/favorite").fetchUserFavorites
+
 
 const addRating = require("../controllers/rating").addRating;
 const fetchRatings = require("../controllers/rating").fetchRatings;
@@ -38,10 +40,11 @@ module.exports = app => {
     app.post("/api/signup", signupController);
     app.post("/api/login", requireLogin, loginController);
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
-    app.get("/api/activities/:userId", fetchUserActivities)
-    app.get("/api/editActivity/:activityId", requireAuth, fetchActivityForEditting)
-    app.post("/api/updateUserActivity/:activityId", requireAuth, updateUserActivity)
-    app.put("/api/deleteUserActivity/:activityId", requireAuth, deleteUserActivity)
+    app.get("/api/activities/:userId", fetchUserActivities);
+    app.get("/api/editActivity/:activityId", requireAuth, fetchActivityForEditting);
+    app.post("/api/updateUserActivity/:activityId", requireAuth, updateUserActivity);
+    app.put("/api/deleteUserActivity/:activityId", requireAuth, deleteUserActivity);
+    app.get("/api/fetchUserFavorites", requireAuth, fetchUserFavorites);
 
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", fetchWish);
