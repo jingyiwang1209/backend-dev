@@ -41,7 +41,9 @@ module.exports = app => {
     app.post("/api/signup", signupController);
     app.post("/api/login", requireLogin, loginController);
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
-    app.get("/api/activities/:userId", fetchUserActivities);
+    app.get("/api/user/:userId", requireAuth, fetchUser);
+
+    app.get("/api/activities/:userId", requireAuth, fetchUserActivities);
     app.get("/api/editActivity/:activityId", requireAuth, fetchActivityForEditting);
     app.post("/api/updateUserActivity/:activityId", requireAuth, updateUserActivity);
     app.put("/api/deleteUserActivity/:activityId", requireAuth, deleteUserActivity);
@@ -49,17 +51,17 @@ module.exports = app => {
     app.get("/api/verifyYourFav/:activityId", requireAuth, verifyYourFev);
 
     app.post("/api/addWish", requireAuth, addWish);
-    app.get("/api/fetchWish", fetchWish);
+    app.get("/api/fetchWish", requireAuth, fetchWish);
     app.post("/api/addActivity", requireAuth, addActivity);
-    app.get("/api/fetchActivity", fetchActivity);
+    app.get("/api/fetchActivity", requireAuth, fetchActivity);
     app.post("/api/clickLikes/:activityId", requireAuth, clickLikes);
-    app.get("/api/activity/:activityId", fetchOneActivity);
-    app.get("/api/wish/:wishId", fetchOneWish);
+    app.get("/api/activity/:activityId", requireAuth, fetchOneActivity);
+    app.get("/api/wish/:wishId", requireAuth, fetchOneWish);
 
-    app.get("/api/user/:userId", fetchUser);
+
     app.post("/api/addRating", requireAuth, addRating);
-    app.get("/api/fetchRatings/:activityId", fetchRatings);
-    app.get("/api/fetchRatingSummary/:activityId", fetchRatingSummary);
-    app.get("/api/searchData?:query", fetchSearchData);
+    app.get("/api/fetchRatings/:activityId", requireAuth, fetchRatings);
+    app.get("/api/fetchRatingSummary/:activityId", requireAuth, fetchRatingSummary);
+    app.get("/api/searchData?:query", requireAuth, fetchSearchData);
     app.post("/api/sendWishLike/:wishId", requireAuth, wishLikes);
 };

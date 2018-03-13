@@ -10,7 +10,7 @@ module.exports.fetchSearchData = (req, res, next) => {
     let location = qs.parse(req.query).location;
     let category = qs.parse(req.query).category;
 
-   console.log('backend', location,category)
+   // console.log('backend', location,category)
 
     let data = [];
     if (category === "activity") {
@@ -44,7 +44,7 @@ module.exports.fetchSearchData = (req, res, next) => {
                 });
             })
             .then(() => {
-                console.log(data);
+                // console.log(data);
                 res.send(data);
             });
     }

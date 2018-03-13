@@ -59,7 +59,9 @@ module.exports.signup = (req, res, next) => {
                 res.send("该邮箱已经存在!");
             } else {
                 let token = generateToken(user);
-                res.send({ token, user: user.dataValues });
+                // username for showing greeting to user on frontend(localStorage)
+
+                res.send({ token, userName: user.dataValues.username });
             }
         });
     } catch (e) {
@@ -69,7 +71,8 @@ module.exports.signup = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
     let user = req.user.dataValues;
-    res.send({ token: generateToken(req.user), user });
+    // username for showing greeting to user on frontend(localStorage)
+    res.send({ token: generateToken(req.user), userName: user.username });
 };
 
 module.exports.updateBasic = (req, res, next) => {
@@ -121,14 +124,23 @@ module.exports.updateBasic = (req, res, next) => {
                     }
                 });
             } else {
-                user
-                    .update({
-                        [key]: value
-                    })
-                    .then(updatedUser => {
-                        // [1]
-                        res.send([key, value]);
+                // beforeUpdate uses on user instance, not User model!!!!!
+                if (key === "password") {
+                    user.cryptPassword(value).then(result => {
+                        user.update({
+                            password: result
+                        });
                     });
+                } else {
+                    user
+                        .update({
+                            [key]: value
+                        })
+                        .then(updatedUser => {
+                            // [1]
+                            res.send([key, value]);
+                        });
+                }
             }
         }
     });

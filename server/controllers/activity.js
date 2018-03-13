@@ -3,8 +3,10 @@ const User = require("../models").User;
 const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
+const passport = require("passport");
+const requireAuth = passport.authenticate("jwt", { session: false });
 
-module.exports.verifyYourFev = (req, res, next) =>{
+module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
     const { activityId } = req.params;
     if (Number.isNaN(parseInt(activityId))) {
@@ -14,21 +16,20 @@ module.exports.verifyYourFev = (req, res, next) =>{
     }
 
     Favorite.findOne({
-        where:{
+        where: {
             userId
         }
-    }).then((fav)=>{
-        if(!fav || fav.favorites.length === 0){
+    }).then(fav => {
+        if (!fav || fav.favorites.length === 0) {
             res.send(false);
-        }else{
-            if(fav.favorites.includes(+activityId)){
+        } else {
+            if (fav.favorites.includes(+activityId)) {
                 res.send(true);
-            }else{
+            } else {
                 res.send(false);
             }
         }
     });
-
 };
 
 module.exports.addActivity = (req, res, next) => {
@@ -86,12 +87,19 @@ module.exports.addActivity = (req, res, next) => {
 };
 
 module.exports.fetchUserActivities = (req, res, next) => {
-    const userId = req.params.userId;
-    if (Number.isNaN(parseInt(userId))) {
+    if (Number.isNaN(parseInt(req.params.userId))) {
         res.send(["输入地址无效"]);
         res.end();
         return null;
     }
+    let userId;
+    // 0 means the person itself is reviewing his/ her file
+    if (+req.params.userId !== 0) {
+        userId = req.params.userId;
+    } else {
+        userId = req.user.id;
+    }
+
     let data = [];
     Activity.findAll({
         where: { userId }
@@ -103,7 +111,7 @@ module.exports.fetchUserActivities = (req, res, next) => {
                     return data;
                 }
             } else {
-                res.send(["该用户不存在"]);
+                res.send(["还没有活动"]);
                 res.end();
                 return null;
             }
@@ -156,6 +164,7 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
                 if (result.dataValues.userId === req.user.id) {
+                    // console.log(result.dataValues)
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此活动" });
@@ -292,6 +301,7 @@ module.exports.fetchActivity = (req, res, next) => {
 };
 
 module.exports.fetchOneActivity = (req, res, next) => {
+    const userId = req.user.id;
     const { activityId } = req.params;
     if (Number.isNaN(parseInt(activityId))) {
         res.send({ warning: "输入地址无效" });
@@ -318,8 +328,13 @@ module.exports.fetchOneActivity = (req, res, next) => {
             User.findById(data.userId)
                 .then(user => {
                     data.username = user.username;
+                    data.mail = user.mail;
+                    if (user.id === userId) {
+                        data.isYourActivity = true;
+                    }
                 })
                 .then(() => {
+                    // console.log(data)
                     res.send(data);
                 });
         })
@@ -400,7 +415,7 @@ module.exports.clickLikes = (req, res, next) => {
         favorite.update({
             favorites: favorite.favorites
         });
-        console.log(favorite.favorites)
+        console.log(favorite.favorites);
         //  [] or [15,4,2]
     });
 };
