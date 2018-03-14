@@ -17,13 +17,22 @@ const clickLikes = require("../controllers/activity").clickLikes;
 const fetchOneActivity = require("../controllers/activity").fetchOneActivity;
 const fetchOneWish = require("../controllers/wish").fetchOneWish;
 
+const fetchUserWishes = require("../controllers/wish").fetchUserWishes;
+const fetchWishForEditting = require("../controllers/wish").fetchWishForEditting;
+const updateUserWish = require("../controllers/wish").updateUserWish;
+const deleteUserWish = require("../controllers/wish").deleteUserWish;
+
+
 const fetchUser = require("../controllers/user").fetchUser;
 const fetchUserActivities = require("../controllers/activity").fetchUserActivities;
 const fetchActivityForEditting = require("../controllers/activity").fetchActivityForEditting;
 const updateUserActivity = require("../controllers/activity").updateUserActivity;
-const deleteUserActivity = require("../controllers/activity").deleteUserActivity
-const fetchUserFavorites = require("../controllers/favorite").fetchUserFavorites
+const deleteUserActivity = require("../controllers/activity").deleteUserActivity;
+const fetchUserFavorites = require("../controllers/favorite").fetchUserFavorites;
+const deleteUserFavorite = require("../controllers/favorite").deleteUserFavorite;
+
 const verifyYourFev = require("../controllers/activity").verifyYourFev;
+
 
 
 const addRating = require("../controllers/rating").addRating;
@@ -48,7 +57,15 @@ module.exports = app => {
     app.post("/api/updateUserActivity/:activityId", requireAuth, updateUserActivity);
     app.put("/api/deleteUserActivity/:activityId", requireAuth, deleteUserActivity);
     app.get("/api/fetchUserFavorites", requireAuth, fetchUserFavorites);
+    app.put("/api/deleteUserFavorite/:favId", requireAuth, deleteUserFavorite);
+
+
     app.get("/api/verifyYourFav/:activityId", requireAuth, verifyYourFev);
+
+    app.get("/api/wishes/:userId", requireAuth, fetchUserWishes);
+    app.get("/api/editWish/:wishId", requireAuth, fetchWishForEditting);
+    app.post("/api/updateUserWish/:wishId", requireAuth, updateUserWish);
+    app.put("/api/deleteUserWish/:wishId", requireAuth, deleteUserWish);
 
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", requireAuth, fetchWish);

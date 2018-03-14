@@ -4,9 +4,44 @@ const Favorite = require("../models").Favorite;
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+module.exports.deleteUserFavorite = (req, res, next) => {
+    const { favId } = req.params;
+    const userId = req.user.id;
+
+    if (Number.isNaN(parseInt(favId))) {
+        res.send("输入地址无效");
+        res.end();
+        return null;
+    }
+    Favorite.findOne({
+        where:{
+            userId,
+        }
+    }).then((fav)=>{
+        // fav [ 20, 18, 19 ]
+       let modifiedFavs;
+        if(fav.favorites.includes(+favId)){
+            let index = fav.favorites.indexOf(+favId);
+            modifiedFavs = fav.favorites.slice(0, index).concat(fav.favorites.slice(index + 1));
+            fav.update({
+            favorites:modifiedFavs,
+                }).then((result)=>{
+            // console.log("Result", result.dataValues.favorites);
+             if(result){
+                res.send(favId);
+               }
+             });
+        }else{
+            res.send("该收藏不存在");
+        }
+    });
+
+};
+
 module.exports.fetchUserFavorites = (req, res, next) => {
     // user must be logged in to get his/her favorites
     const userId = req.user.id;
+
     // console.log("userid", userId)
     let data = [];
     Favorite.findOne({

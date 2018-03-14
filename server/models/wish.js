@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     services: {
       type:DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue:[],
-    }
+    },
+    note:DataTypes.STRING
 
   });
 

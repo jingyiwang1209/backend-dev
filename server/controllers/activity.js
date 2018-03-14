@@ -107,9 +107,16 @@ module.exports.fetchUserActivities = (req, res, next) => {
         .then(result => {
             if (result && result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
-                    data.push(result[i].dataValues);
-                    return data;
+                    let value = result[i].dataValues;
+                    if (req.user.id === value.userId){
+                        value["areYourActivities"] = true;
+                    }
+
+                    data.push(value);
+
                 }
+
+                return data;
             } else {
                 res.send(["还没有活动"]);
                 res.end();
@@ -133,6 +140,7 @@ module.exports.fetchUserActivities = (req, res, next) => {
             // createdAt: 2018-02-21T02:18:16.284Z,
             // updatedAt: 2018-02-21T02:18:16.284Z,
             // userId: 6 } ]
+            console.log("data?", data)
             res.send(data);
         })
         .catch(e => next(e));
@@ -196,12 +204,8 @@ module.exports.updateUserActivity = (req, res, next) => {
     })
         .then(result => {
             // [1]
-            if (result && result.length > 0) {
-                if (result[0] === 1) {
-                    res.send("修改成功！");
-                } else {
-                    res.send("修改失败");
-                }
+            if (result && result.length === 1) {
+                res.send("修改成功！");
             } else {
                 res.send("该活动不存在或者你没有修改权限!");
             }
@@ -228,15 +232,12 @@ module.exports.deleteUserActivity = (req, res, next) => {
     })
         .then(result => {
             // console.log("Result",result)
-            if (result >= 0) {
-                if (result === 1) {
-                    res.send("成功删除该活动");
-                } else {
-                    // result === 0
-                    res.send("该活动不存在");
-                }
-            } else {
-                res.send("你没有权限");
+            if (result === 1) {
+                res.send("成功删除该活动");
+            }
+            // result === 0
+             else {
+                res.send("你没有权限或者该活动不存在");
             }
         })
         .catch(e => {
@@ -404,18 +405,20 @@ module.exports.clickLikes = (req, res, next) => {
             favorites: [+activityId]
         }
     }).spread((favorite, created) => {
+        let modifiedFavs
         if (!created) {
             if (favorite.favorites.includes(+activityId)) {
                 let index = favorite.favorites.indexOf(+activityId);
-                favorite.favorites.pop(index);
+                modifiedFavs = favorite.favorites.slice(0, index).concat(favorite.favorites.slice(index+1))
             } else {
                 favorite.favorites.push(+activityId);
+                modifiedFavs = favorite.favorites;
             }
         }
         favorite.update({
-            favorites: favorite.favorites
+            favorites:modifiedFavs
         });
-        console.log(favorite.favorites);
+        // console.log(favorite.favorites);
         //  [] or [15,4,2]
     });
 };
