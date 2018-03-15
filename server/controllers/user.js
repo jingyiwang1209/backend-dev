@@ -3,27 +3,45 @@ const User = require("../models").User;
 module.exports.fetchUser = (req, res, next) => {
     let userId;
     // 0 means the person itself is reviewing his/ her file
-    if(+req.params.userId !== 0){
+    if (+req.params.userId !== 0) {
         userId = req.params.userId;
-    }else{
+    } else {
         userId = req.user.id;
     }
 
-    User.findById(userId).then(user => {
+    User.findOne({
+        where: {
+            id: userId
+        },
+        attributes: [
+            "id",
+            'mail',
+            "username",
+            "sex",
+            "age",
+            "city",
+            "yearOfLiving",
+            "hometown",
+            "school",
+            "major",
+            "language",
+            "hobby",
+            "personality"
+        ]
+    }).then(user => {
         if (!user) {
             res.send({ warning: "该用户不存在" });
             res.end();
             return null;
-        }else{
+        } else {
+            console.log("userbasic", user.dataValues);
             res.send(user.dataValues);
         }
-
     });
 };
 
 // { id: 6,
 //  mail: 'robert@yahoo.com',
-//  password: '$2a$10$bqeLmIeOYu/prAGamSP0s.cIuLyVpktpqdeCsXCa0KVpRASQhzFlW',
 //  username: 'Robert',
 //  sex: 'male',
 //  age: 40,

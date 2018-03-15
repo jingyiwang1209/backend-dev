@@ -1,69 +1,155 @@
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 const Activity = require("../models").Activity;
 const Wish = require("../models").Wish;
+const User = require("../models").User;
+const Rating = require("../models").Rating;
 const qs = require("qs");
-
-
+const Op = Sequelize.Op;
 
 module.exports.fetchSearchData = (req, res, next) => {
     // { location: '石家庄市 河北省', services: [ '徒步旅行' ] }
     let location = qs.parse(req.query).location;
     let category = qs.parse(req.query).category;
 
-   // console.log('backend', location,category)
+    // console.log('backend', location,category)
 
     let data = [];
-    if (category === "activity") {
+    if (category === "活动") {
         Activity.findAndCountAll({
+            where: {
+                location: location
+            }
+        }).then(result => {
+            let length = result.count;
+            if (result.count === 0) {
+                res.send(["尚未有该城市活动"]);
+                return null;
+            } else {
+                result.rows.forEach(row => {
+                    let activityObj = row.dataValues;
+                    activityObj["counter"] = result.count;
+                    activityObj["category"] = "活动";
+
+                    Rating.findAndCountAll({
+                        where: {
+                            activityId: activityObj.id
+                        }
+                    }).then(result => {
+                        if (result.count === 0) {
+                            activityObj["averageScore"] = 0;
+                        } else if (result.count === 1) {
+                            activityObj["averageScore"] =
+                                result.rows[0].dataValues.numOfStars;
+                        } else {
+                            let totalScore = 0;
+                            result.rows.forEach(item => {
+                                totalScore += item.dataValues.numOfStars;
+                            });
+                            let averageScore =
+                                Math.floor(totalScore / result.count * 100) /
+                                100;
+                            activityObj["averageScore"] = averageScore;
+                        }
+                        data.push(activityObj);
+                        if (data.length === length) {
+                            // console.log("data", data);
+                            res.send(data);
+                        }
+                    });
+                });
+            }
+        });
+    } else if (category === "愿望") {
+        Wish.findAndCountAll({
             where: {
                 location: location
             }
         })
             .then(result => {
-                result.rows.forEach(row => {
-                    row.dataValues["counter"] = result.count;
-                    row.dataValues['category'] = "activity";
-                    data.push(row.dataValues);
-                });
+                if (result.count === 0) {
+                    res.send(["尚未有该城市愿望"]);
+                    return null;
+                } else {
+                    result.rows.forEach(row => {
+                        row.dataValues["counter"] = result.count;
+                        row.dataValues["category"] = "愿望";
+                        data.push(row.dataValues);
+                    });
+                    return data;
+                }
             })
-            .then(() => {
-                console.log(data);
-                res.send(data);
-            });
-    } else if (category === "wish") {
-        Wish.findAndCountAll({
-            where: {
-                location: location,
-            }
-        })
-            .then(result => {
-                result.rows.forEach(row => {
-                    row.dataValues["counter"] = result.count;
-                    row.dataValues['category'] = "wish";
-                    data.push(row.dataValues);
-                });
-            })
-            .then(() => {
+            .then(data => {
                 // console.log(data);
-                res.send(data);
+                if (data) {
+                    res.send(data);
+                }
             });
+    } else if (category === "向导") {
+        let guides = [];
+        let data = [];
+        Activity.findAndCountAll({
+            where: {
+                location: location
+            }
+        }).then(result => {
+            if (result.count === 0) {
+                res.send(["尚未有该城市向导，请确认从城市列表中选择"]);
+                return null;
+            } else {
+                result.rows.forEach(row => {
+                    // row.dataValues["counter"] = result.count;
+                    // row.dataValues["category"] = "guide";
+                    // data.push(row.dataValues);
+                    guides.push(row.dataValues.userId);
+                });
+
+                User.findAndCountAll({
+                    where: {
+                        id: {
+                            [Op.or]: guides
+                        }
+                    }
+                })
+                    .then(result => {
+                        result.rows.forEach(row => {
+                            let guide = {};
+                            guide["counter"] = result.count;
+                            guide["category"] = "向导";
+                            guide["age"] = row.dataValues.age
+                            guide["id"] = row.dataValues.id;
+                            guide["username"] = row.dataValues.username;
+                            guide["sex"] = row.dataValues.sex;
+                            guide["language"] = row.dataValues.language;
+                            guide["location"] = location;
+                            data.push(guide);
+                        });
+
+                        return data;
+                    })
+                    .then(data => {
+                        // console.log("data", data);
+                        // [
+                        //     {
+                        //         counter: 2,
+                        //         category: "guide",
+                        //         username: "理工狗",
+                        //         sex: "男",
+                        //         language: "普通话，大连话"
+                        //     },
+                        //     {
+                        //         counter: 2,
+                        //         category: "guide",
+                        //         username: "柯基的守护神",
+                        //         sex: "女",
+                        //         language: "普通话，英语，日语"
+                        //     }
+                        // ];
+                        if (data) {
+                            res.send(data);
+                        }
+                    });
+            }
+        });
     }
 };
 
-// [ { id: 7,
-//     theme: '大连城市风光游',
-//     location: '大连市 辽宁省',
-//     departdate: '23 Feb 2018 6:16',
-//     finishdate: '28 Feb 2018 6:16',
-//     budget: '5000',
-//     services: [ '徒步旅行', '汽车接送', '购物打折' ],
-//     story: '我在大连生活了10年。这里的一山一水一草一木都充满了灵性。大连是一个热情，开方，时尚的城市。海纳百川，兼容并蓄。',
-//     images: [],
-//     createdAt: 2018-02-21T02:18:16.284Z,
-//     updatedAt: 2018-02-21T02:18:16.284Z,
-//     userId: 6,
-//     counter: 1,
- //    category:"wish"
- // } ]
-
-// return [] if not found

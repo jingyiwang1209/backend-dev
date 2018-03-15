@@ -108,14 +108,12 @@ module.exports.fetchUserActivities = (req, res, next) => {
             if (result && result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
                     let value = result[i].dataValues;
-                    if (req.user.id === value.userId){
+                    // just in case in the future the page needs to add some thing different for the user who created the activities
+                    if (req.user.id === value.userId) {
                         value["areYourActivities"] = true;
                     }
-
                     data.push(value);
-
                 }
-
                 return data;
             } else {
                 res.send(["还没有活动"]);
@@ -140,7 +138,7 @@ module.exports.fetchUserActivities = (req, res, next) => {
             // createdAt: 2018-02-21T02:18:16.284Z,
             // updatedAt: 2018-02-21T02:18:16.284Z,
             // userId: 6 } ]
-            console.log("data?", data)
+            console.log("data?", data);
             res.send(data);
         })
         .catch(e => next(e));
@@ -234,9 +232,8 @@ module.exports.deleteUserActivity = (req, res, next) => {
             // console.log("Result",result)
             if (result === 1) {
                 res.send("成功删除该活动");
-            }
-            // result === 0
-             else {
+            } else {
+                // result === 0
                 res.send("你没有权限或者该活动不存在");
             }
         })
@@ -405,18 +402,20 @@ module.exports.clickLikes = (req, res, next) => {
             favorites: [+activityId]
         }
     }).spread((favorite, created) => {
-        let modifiedFavs
+        let modifiedFavs;
         if (!created) {
             if (favorite.favorites.includes(+activityId)) {
                 let index = favorite.favorites.indexOf(+activityId);
-                modifiedFavs = favorite.favorites.slice(0, index).concat(favorite.favorites.slice(index+1))
+                modifiedFavs = favorite.favorites
+                    .slice(0, index)
+                    .concat(favorite.favorites.slice(index + 1));
             } else {
                 favorite.favorites.push(+activityId);
                 modifiedFavs = favorite.favorites;
             }
         }
         favorite.update({
-            favorites:modifiedFavs
+            favorites: modifiedFavs
         });
         // console.log(favorite.favorites);
         //  [] or [15,4,2]
