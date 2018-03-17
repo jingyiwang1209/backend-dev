@@ -4,7 +4,9 @@ const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
 const passport = require("passport");
+const validateInput = require("../validation/validate").validateInput;
 const requireAuth = passport.authenticate("jwt", { session: false });
+
 
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
@@ -33,12 +35,11 @@ module.exports.verifyYourFev = (req, res, next) => {
 };
 
 module.exports.addActivity = (req, res, next) => {
-    try {
-        const images = req.body.images;
-        const imageURLs = images.map(image => {
-            let imageURL = image[0].preview.slice(5);
-            return imageURL;
-        });
+        // const images = req.body.images;
+        // const imageURLs = images.map(image => {
+        //     let imageURL = image[0].preview.slice(5);
+        //     return imageURL;
+        // });
 
         const {
             theme,
@@ -49,6 +50,10 @@ module.exports.addActivity = (req, res, next) => {
             services,
             story
         } = req.body;
+
+        // if(!validateInput(req.body)){
+        //     return null;
+        // };
         const userId = req.user.id;
         // console.log("userId", userId);
         Activity.findOrCreate({
@@ -60,7 +65,6 @@ module.exports.addActivity = (req, res, next) => {
                 budget,
                 services,
                 story,
-                images: imageURLs,
                 userId
             },
             defaults: {
@@ -71,7 +75,6 @@ module.exports.addActivity = (req, res, next) => {
                 budget,
                 services,
                 story,
-                images: imageURLs,
                 userId
             }
         }).spread((activity, created) => {
@@ -80,10 +83,8 @@ module.exports.addActivity = (req, res, next) => {
             } else {
                 res.send("活动被成功创建!");
             }
-        });
-    } catch (e) {
-        next(e);
-    }
+        }).catch((e)=>next(e));
+
 };
 
 module.exports.fetchUserActivities = (req, res, next) => {

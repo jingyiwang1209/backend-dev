@@ -2,10 +2,14 @@ const User = require("../models").User;
 const jwt = require("jwt-simple");
 const keys = require("../config/keys");
 const qs = require("qs");
+
+
 const generateToken = user => {
     const timestamp = new Date().getTime();
     return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
+
+
 
 module.exports.verifySignupEmail = (req, res, next) => {
     let email = qs.parse(req.query).email;
@@ -96,6 +100,7 @@ module.exports.updateBasic = (req, res, next) => {
     // updatedAt: 2018-02-26T21:00:40.142Z }
     const userId = req.user.id;
     const updates = req.body;
+
     // console.log("updatesdata", updates);
     // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
     let { key, value } = updates;

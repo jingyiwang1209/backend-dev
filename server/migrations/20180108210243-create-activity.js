@@ -9,38 +9,42 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       theme: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       location: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       departdate: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       finishdate: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       budget: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       services: {
+        allowNull: false,
         type: Sequelize.ARRAY(Sequelize.TEXT)
       },
       story: {
+        allowNull: false,
         type: Sequelize.STRING
       },
-      images: {
-        type: Sequelize.ARRAY(Sequelize.TEXT)
-      },
+
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       userId: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {

@@ -93,7 +93,7 @@ module.exports.fetchSearchData = (req, res, next) => {
             }
         }).then(result => {
             if (result.count === 0) {
-                res.send(["尚未有该城市向导，请确认从城市列表中选择"]);
+                res.send(["尚未有该城市向导"]);
                 return null;
             } else {
                 result.rows.forEach(row => {

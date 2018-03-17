@@ -11,10 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:[],
     },
     story: DataTypes.STRING,
-    images: {
-      type:DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue:[],
-    },
+
 
   });
 
