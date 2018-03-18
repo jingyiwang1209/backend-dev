@@ -17,6 +17,10 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER
       },
+
+      activityId:{
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -26,13 +30,13 @@ module.exports = {
         type: Sequelize.DATE
       },
 
-      activityId:{
+      creatorId:{
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {
-          model: 'Activities',
+          model: 'Users',
           key: 'id',
-          as: 'activityId',
+          as: 'creatorId',
         },
       }
     });

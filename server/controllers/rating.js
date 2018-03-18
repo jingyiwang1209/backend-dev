@@ -5,7 +5,7 @@ const Activity = require("../models").Activity;
 // One person only sends one time.
 module.exports.addRating = (req, res, next) => {
     const userId = req.user.id;
-    const { numOfStars, feedback, activityId } = req.body;
+    const { numOfStars, feedback, activityId, creatorId } = req.body;
 
     Rating.findOrCreate({
         where: {
@@ -15,13 +15,14 @@ module.exports.addRating = (req, res, next) => {
         defaults: {
             numOfStars,
             feedback,
-            activityId
+            activityId,
+            creatorId
         }
     }).spread((rating, created) => {
         if (!created) {
             res.send({});
         } else {
-            res.send({ userId, numOfStars, feedback, activityId });
+            res.send({ userId, numOfStars, feedback, activityId, creatorId });
         }
     });
 };
