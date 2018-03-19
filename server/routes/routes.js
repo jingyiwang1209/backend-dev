@@ -24,6 +24,7 @@ const deleteUserWish = require("../controllers/wish").deleteUserWish;
 
 
 const fetchUser = require("../controllers/user").fetchUser;
+const fetchComments = require("../controllers/user").fetchComments;
 const fetchUserActivities = require("../controllers/activity").fetchUserActivities;
 const fetchActivityForEditting = require("../controllers/activity").fetchActivityForEditting;
 const updateUserActivity = require("../controllers/activity").updateUserActivity;
@@ -51,6 +52,7 @@ module.exports = app => {
     app.post("/api/login", requireLogin, loginController);
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
     app.get("/api/user/:userId", requireAuth, fetchUser);
+    app.get("/api/comments/:userId", requireAuth, fetchComments);
 
     app.get("/api/activities/:userId", requireAuth, fetchUserActivities);
     app.get("/api/editActivity/:activityId", requireAuth, fetchActivityForEditting);
