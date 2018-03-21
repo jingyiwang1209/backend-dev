@@ -35,18 +35,13 @@ module.exports.verifyYourFev = (req, res, next) => {
 };
 
 module.exports.addActivity = (req, res, next) => {
-        // const images = req.body.images;
-        // const imageURLs = images.map(image => {
-        //     let imageURL = image[0].preview.slice(5);
-        //     return imageURL;
-        // });
-
         const {
             theme,
             location,
             departdate,
             finishdate,
             budget,
+            numberOfPeople,
             services,
             story
         } = req.body;
@@ -63,6 +58,7 @@ module.exports.addActivity = (req, res, next) => {
                 departdate,
                 finishdate,
                 budget,
+                numberOfPeople,
                 services,
                 story,
                 userId
@@ -73,6 +69,7 @@ module.exports.addActivity = (req, res, next) => {
                 departdate,
                 finishdate,
                 budget,
+                numberOfPeople,
                 services,
                 story,
                 userId
@@ -244,6 +241,7 @@ module.exports.deleteUserActivity = (req, res, next) => {
 };
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
+
     let response = [];
     Activity.findAll()
         .then(activities => {
@@ -297,6 +295,8 @@ module.exports.fetchActivity = (req, res, next) => {
             }
         })
         .catch(e => next(e));
+
+
 };
 
 module.exports.fetchOneActivity = (req, res, next) => {

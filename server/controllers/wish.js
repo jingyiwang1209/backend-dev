@@ -77,7 +77,7 @@ module.exports.updateUserWish = (req, res, next) => {
     const userId = req.user.id;
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
-    // console.log("edittedValues", edittedValues)
+    console.log("edittedValues", edittedValues)
     if (Number.isNaN(parseInt(wishId))) {
         res.send("输入地址无效");
         res.end();
@@ -136,7 +136,7 @@ module.exports.deleteUserWish = (req, res, next) => {
 
 
 module.exports.addWish = (req, res, next) => {
-    const { location, departdate, finishdate, budget, services, note } = req.body;
+    const { location, departdate, finishdate, budget, numberOfPeople, services, note } = req.body;
     const userId = req.user.id;
     // console.log("userId", userId);
     Wish.findOrCreate({
@@ -145,6 +145,7 @@ module.exports.addWish = (req, res, next) => {
             departdate,
             finishdate,
             budget,
+            numberOfPeople,
             services,
             userId,
             note
@@ -154,6 +155,7 @@ module.exports.addWish = (req, res, next) => {
             departdate,
             finishdate,
             budget,
+            numberOfPeople,
             services,
             userId,
             note

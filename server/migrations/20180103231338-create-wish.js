@@ -20,6 +20,9 @@ module.exports = {
       budget: {
         type: Sequelize.STRING
       },
+      numberOfPeople:{
+         type: Sequelize.INTEGER
+      },
       services: {
         type: Sequelize.ARRAY(Sequelize.TEXT)
       },

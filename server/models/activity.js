@@ -6,13 +6,12 @@ module.exports = (sequelize, DataTypes) => {
     departdate: DataTypes.STRING,
     finishdate: DataTypes.STRING,
     budget: DataTypes.STRING,
+    numberOfPeople: DataTypes.INTEGER,
     services: {
       type:DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue:[],
     },
     story: DataTypes.STRING,
-
-
   });
 
   Activity.associate = function(models) {

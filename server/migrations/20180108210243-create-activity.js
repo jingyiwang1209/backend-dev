@@ -28,6 +28,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      numberOfPeople:{
+         type: Sequelize.INTEGER
+      },
       services: {
         allowNull: false,
         type: Sequelize.ARRAY(Sequelize.TEXT)
