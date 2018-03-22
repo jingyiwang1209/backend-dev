@@ -241,7 +241,7 @@ module.exports.fetchOneWish = (req, res, next) => {
                     console.log("wish", data)
                     res.send(data);
                 });
-        });
+        }).catch((e)=>next(e))
 };
 // { id: 3,
 //   location: '唐山市 河北省',

@@ -1,10 +1,36 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   var Rating = sequelize.define("Rating", {
-    feedback: DataTypes.STRING,
-    numOfStars: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER,
-    activityId:DataTypes.INTEGER,
+    numOfStars: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true,
+        isIn: [[1,2,3,4,5]]
+      }
+    },
+
+    feedback: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [0, 300]
+      }
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
+      }
+    },
+    activityId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
+      }
+    }
   });
 
   Rating.associate = function(models) {

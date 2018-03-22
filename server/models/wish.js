@@ -1,23 +1,61 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   const Wish = sequelize.define("Wish", {
-    location: DataTypes.STRING,
-    departdate: DataTypes.STRING,
-    finishdate: DataTypes.STRING,
-    budget: DataTypes.STRING,
-    numberOfPeople: DataTypes.INTEGER,
-    services: {
-      type:DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue:[],
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
     },
-    note:DataTypes.STRING
-
+    departdate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isDate: true
+      }
+    },
+    finishdate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isDate: true
+      }
+    },
+    budget: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isNumeric: true
+      }
+    },
+    numberOfPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
+      }
+    },
+    services: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      defaultValue: [],
+      allowNull: false
+    },
+    note: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        notEmpty: false,
+        len: [0, 300]
+      }
+    }
   });
 
   Wish.associate = function(models) {
     Wish.belongsTo(models.User, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
+      foreignKey: "userId",
+      onDelete: "CASCADE"
     });
   };
 

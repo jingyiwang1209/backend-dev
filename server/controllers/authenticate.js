@@ -1,3 +1,4 @@
+const Sequelize = require("sequelize");
 const User = require("../models").User;
 const jwt = require("jwt-simple");
 const keys = require("../config/keys");
@@ -13,6 +14,10 @@ const generateToken = user => {
 
 module.exports.verifySignupEmail = (req, res, next) => {
     let email = qs.parse(req.query).email;
+    if(!email){
+        res.send(false);
+        return;
+    }
     User.findOne({
         where: { mail: email }
     }).then(user => {
@@ -24,7 +29,6 @@ module.exports.verifySignupEmail = (req, res, next) => {
     });
 };
 module.exports.signup = (req, res, next) => {
-    try {
         const {
             email,
             password,
@@ -67,10 +71,10 @@ module.exports.signup = (req, res, next) => {
 
                 res.send({ token, userName: user.dataValues.username });
             }
+        }).catch((e)=>{
+            next(e)
         });
-    } catch (e) {
-        next(e);
-    }
+
 };
 
 module.exports.login = (req, res, next) => {
@@ -148,5 +152,5 @@ module.exports.updateBasic = (req, res, next) => {
                 }
             }
         }
-    });
+    }).catch((e)=>next(e));
 };

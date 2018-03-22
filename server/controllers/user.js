@@ -96,7 +96,7 @@ module.exports.fetchUser = (req, res, next) => {
             console.log("userbasic", user.dataValues);
             res.send(user.dataValues);
         }
-    });
+    }).catch((e)=>next(e))
 };
 
 // { id: 6,

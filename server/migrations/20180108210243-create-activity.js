@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Activities', {
+    return queryInterface.createTable("Activities", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,35 +9,60 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       theme: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          notEmpty: true,
+          len: [1, 15]
+        }
       },
       location: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          notEmpty: true
+        }
       },
       departdate: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          isDate: true
+        }
       },
       finishdate: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          isDate: true
+        }
       },
       budget: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          notEmpty: true,
+          isNumeric: true
+        }
       },
-      numberOfPeople:{
-         type: Sequelize.INTEGER
+      numberOfPeople: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
       },
       services: {
-        allowNull: false,
-        type: Sequelize.ARRAY(Sequelize.TEXT)
+        type: Sequelize.ARRAY(Sequelize.TEXT),
+        allowNull: false
       },
       story: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          notEmpty: true,
+          len: [1, 300]
+        }
       },
 
       createdAt: {
@@ -49,16 +74,16 @@ module.exports = {
       userId: {
         allowNull: false,
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
         references: {
-          model: 'Users',
-          key: 'id',
-          as: 'userId',
-        },
-      },
+          model: "Users",
+          key: "id",
+          as: "userId"
+        }
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Activities');
+    return queryInterface.dropTable("Activities");
   }
 };

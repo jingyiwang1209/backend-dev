@@ -1,25 +1,44 @@
-'use strict';
+"use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Ratings', {
+    return queryInterface.createTable("Ratings", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      feedback: {
-        type: Sequelize.STRING
-      },
+
       numOfStars: {
-        type: Sequelize.INTEGER
-      },
-      userId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true,
+          isIn: [[1,2,3,4,5]]
+        }
       },
 
-      activityId:{
+       feedback: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          len: [0, 300]
+        }
+      },
+      userId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
+      },
+
+      activityId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
       },
       createdAt: {
         allowNull: false,
@@ -30,18 +49,18 @@ module.exports = {
         type: Sequelize.DATE
       },
 
-      creatorId:{
+      creatorId: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
         references: {
-          model: 'Users',
-          key: 'id',
-          as: 'creatorId',
-        },
+          model: "Users",
+          key: "id",
+          as: "creatorId"
+        }
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Ratings');
+    return queryInterface.dropTable("Ratings");
   }
 };

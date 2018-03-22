@@ -1,23 +1,69 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   const Activity = sequelize.define("Activity", {
-    theme:DataTypes.STRING,
-    location: DataTypes.STRING,
-    departdate: DataTypes.STRING,
-    finishdate: DataTypes.STRING,
-    budget: DataTypes.STRING,
-    numberOfPeople: DataTypes.INTEGER,
-    services: {
-      type:DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue:[],
+    theme: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [1, 15]
+      }
     },
-    story: DataTypes.STRING,
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    departdate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isDate: true
+      }
+    },
+    finishdate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isDate: true
+      }
+    },
+    budget: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isNumeric: true
+      }
+    },
+    numberOfPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
+      }
+    },
+    services: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      defaultValue: [],
+      allowNull: false
+    },
+    story: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [1, 300]
+      }
+    }
   });
 
   Activity.associate = function(models) {
     Activity.belongsTo(models.User, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
+      foreignKey: "userId",
+      onDelete: "CASCADE"
     });
   };
 

@@ -6,7 +6,6 @@ const Activity = require("../models").Activity;
 module.exports.addRating = (req, res, next) => {
     const userId = req.user.id;
     const { numOfStars, feedback, activityId, creatorId } = req.body;
-
     Rating.findOrCreate({
         where: {
             userId,
@@ -24,7 +23,7 @@ module.exports.addRating = (req, res, next) => {
         } else {
             res.send({ userId, numOfStars, feedback, activityId, creatorId });
         }
-    });
+    }).catch((e)=>next(e));
 };
 
 // { userId, numOfStars,feedback}

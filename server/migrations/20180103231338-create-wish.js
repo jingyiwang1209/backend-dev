@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Wishes', {
+    return queryInterface.createTable("Wishes", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,23 +9,55 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       location: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
       },
       departdate: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          isDate: true
+        }
       },
       finishdate: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          isDate: true
+        }
       },
       budget: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          isNumeric: true
+        }
       },
-      numberOfPeople:{
-         type: Sequelize.INTEGER
+      numberOfPeople: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
       },
       services: {
-        type: Sequelize.ARRAY(Sequelize.TEXT)
+        type: Sequelize.ARRAY(Sequelize.TEXT),
+        allowNull: false
       },
+
+      note: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        validate: {
+          notEmpty: false,
+          len: [0, 300]
+        }
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -36,16 +68,16 @@ module.exports = {
       },
       userId: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
         references: {
-          model: 'Users',
-          key: 'id',
-          as: 'userId',
-        },
-      },
+          model: "Users",
+          key: "id",
+          as: "userId"
+        }
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Wishes');
+    return queryInterface.dropTable("Wishes");
   }
 };

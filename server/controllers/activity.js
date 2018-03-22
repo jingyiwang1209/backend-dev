@@ -4,7 +4,6 @@ const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
 const passport = require("passport");
-const validateInput = require("../validation/validate").validateInput;
 const requireAuth = passport.authenticate("jwt", { session: false });
 
 
