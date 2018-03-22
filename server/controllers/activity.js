@@ -84,7 +84,8 @@ module.exports.addActivity = (req, res, next) => {
 
 };
 
-module.exports.fetchUserActivities = (req, res, next) => {
+module.exports.fetchUserActivities = async (req, res, next) => {
+
     if (Number.isNaN(parseInt(req.params.userId))) {
         res.send(["输入地址无效"]);
         res.end();
@@ -97,6 +98,7 @@ module.exports.fetchUserActivities = (req, res, next) => {
     } else {
         userId = req.user.id;
     }
+
 
     let data = [];
     Activity.findAll({
@@ -136,8 +138,9 @@ module.exports.fetchUserActivities = (req, res, next) => {
             // createdAt: 2018-02-21T02:18:16.284Z,
             // updatedAt: 2018-02-21T02:18:16.284Z,
             // userId: 6 } ]
-            console.log("data?", data);
+            // console.log("data", data);
             res.send(data);
+
         })
         .catch(e => next(e));
 };
