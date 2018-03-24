@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.213.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
@@ -28,7 +29,8 @@
     "pg-hstore": "^2.3.2",
     "qs": "^6.5.1",
     "redis": "^2.8.0",
-    "sequelize": "^4.28.1"
+    "sequelize": "^4.28.1",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "nodemon": "^1.12.7"

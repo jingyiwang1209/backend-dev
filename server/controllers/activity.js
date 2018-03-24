@@ -6,7 +6,6 @@ const Favorite = require("../models").Favorite;
 const passport = require("passport");
 const requireAuth = passport.authenticate("jwt", { session: false });
 
-
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
     const { activityId } = req.params;
@@ -34,7 +33,22 @@ module.exports.verifyYourFev = (req, res, next) => {
 };
 
 module.exports.addActivity = (req, res, next) => {
-        const {
+    const {
+        theme,
+        location,
+        departdate,
+        finishdate,
+        budget,
+        numberOfPeople,
+        services,
+        story,
+        imageurl
+    } = req.body;
+
+    const userId = req.user.id;
+    // console.log("userId", userId);
+    Activity.findOrCreate({
+        where: {
             theme,
             location,
             departdate,
@@ -42,49 +56,34 @@ module.exports.addActivity = (req, res, next) => {
             budget,
             numberOfPeople,
             services,
-            story
-        } = req.body;
-
-        // if(!validateInput(req.body)){
-        //     return null;
-        // };
-        const userId = req.user.id;
-        // console.log("userId", userId);
-        Activity.findOrCreate({
-            where: {
-                theme,
-                location,
-                departdate,
-                finishdate,
-                budget,
-                numberOfPeople,
-                services,
-                story,
-                userId
-            },
-            defaults: {
-                theme,
-                location,
-                departdate,
-                finishdate,
-                budget,
-                numberOfPeople,
-                services,
-                story,
-                userId
-            }
-        }).spread((activity, created) => {
+            story,
+            imageurl,
+            userId
+        },
+        defaults: {
+            theme,
+            location,
+            departdate,
+            finishdate,
+            budget,
+            numberOfPeople,
+            services,
+            story,
+            imageurl,
+            userId
+        }
+    })
+        .spread((activity, created) => {
             if (!created) {
                 res.send("你已经提交过同样的活动了！");
             } else {
                 res.send("活动被成功创建!");
             }
-        }).catch((e)=>next(e));
-
+        })
+        .catch(e => next(e));
 };
 
 module.exports.fetchUserActivities = async (req, res, next) => {
-
     if (Number.isNaN(parseInt(req.params.userId))) {
         res.send(["输入地址无效"]);
         res.end();
@@ -97,7 +96,6 @@ module.exports.fetchUserActivities = async (req, res, next) => {
     } else {
         userId = req.user.id;
     }
-
 
     let data = [];
     Activity.findAll({
@@ -139,7 +137,6 @@ module.exports.fetchUserActivities = async (req, res, next) => {
             // userId: 6 } ]
             // console.log("data", data);
             res.send(data);
-
         })
         .catch(e => next(e));
 };
@@ -152,7 +149,7 @@ module.exports.fetchUserActivities = async (req, res, next) => {
 //   budget: '5000',
 //   services: [ '徒步旅行', '购物打折' ],
 //   story: '我在北京呆了2年，对北京文化，景点念念不忘。北京的景点大气辉煌，充满历史感。我一定会带你领略中华在过去的帝国风采。',
-//   images: [ 'http://localhost:3000/a8a47ac8-30e7-4de6-b394-a03f9b0996c3' ],
+//   imageurl: 'xxxxxxxxxxxxxxx',
 //   createdAt: 2018-03-01T17:48:00.606Z,
 //   updatedAt: 2018-03-01T17:48:00.606Z,
 //   userId: 9 }
@@ -194,23 +191,45 @@ module.exports.updateUserActivity = (req, res, next) => {
         return null;
     }
 
-    Activity.update(edittedValues, {
-        where: {
-            id: activityId,
-            userId
-        }
-    })
-        .then(result => {
-            // [1]
-            if (result && result.length === 1) {
-                res.send("修改成功！");
-            } else {
-                res.send("该活动不存在或者你没有修改权限!");
+    if (edittedValues.hasOwnProperty("imageurl")) {
+        Activity.findOne({
+            where: {
+                id: activityId,
+                userId
             }
         })
-        .catch(e => {
-            next(e);
-        });
+            .then(result => {
+                if (!result) {
+                    return res.send("该活动不存在或者你没有修改权限!");
+                } else {
+                    if (result.imageurl) {
+                        // console.log("oldimageurl", result.imageurl);
+                        res.send({ oldimageurl: result.imageurl });
+                    }
+
+                    return result.update({ imageurl: edittedValues.imageurl });
+                }
+            })
+            .catch(e => next(e));
+    } else {
+        Activity.update(edittedValues, {
+            where: {
+                id: activityId,
+                userId
+            }
+        })
+            .then(result => {
+                // [1]
+                if (result && result.length === 1) {
+                    res.send("修改成功！");
+                } else {
+                    res.send("该活动不存在或者你没有修改权限!");
+                }
+            })
+            .catch(e => {
+                next(e);
+            });
+    }
 };
 
 module.exports.deleteUserActivity = (req, res, next) => {
@@ -222,28 +241,47 @@ module.exports.deleteUserActivity = (req, res, next) => {
         return null;
     }
     const userId = req.user.id;
-    Activity.destroy({
+    Activity.findOne({
         where: {
             id: activityId,
             userId
         }
     })
         .then(result => {
-            // console.log("Result",result)
-            if (result === 1) {
-                res.send("成功删除该活动");
-            } else {
-                // result === 0
+            if (!result) {
                 res.send("你没有权限或者该活动不存在");
+            } else {
+                res.send({ imgurl: result.imageurl });
+                result.destroy().then(() => {
+                    console.log("done");
+                });
             }
         })
         .catch(e => {
             next(e);
         });
+
+    // Activity.destroy({
+    //     where: {
+    //         id: activityId,
+    //         userId
+    //     }
+    // })
+    //     .then(result => {
+    //         // console.log("Result",result)
+    //         if (result === 1) {
+    //             res.send("成功删除该活动");
+    //         } else {
+    //             // result === 0
+    //             res.send("你没有权限或者该活动不存在");
+    //         }
+    //     })
+    //     .catch(e => {
+    //         next(e);
+    //     });
 };
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
-
     let response = [];
     Activity.findAll()
         .then(activities => {
@@ -297,8 +335,6 @@ module.exports.fetchActivity = (req, res, next) => {
             }
         })
         .catch(e => next(e));
-
-
 };
 
 module.exports.fetchOneActivity = (req, res, next) => {
@@ -330,12 +366,13 @@ module.exports.fetchOneActivity = (req, res, next) => {
                 .then(user => {
                     data.username = user.username;
                     data.mail = user.mail;
+                    data.userimageurl = user.imageurl;
                     if (user.id === userId) {
                         data.isYourActivity = true;
                     }
                 })
                 .then(() => {
-                    // console.log(data)
+                    console.log(data);
                     res.send(data);
                 });
         })

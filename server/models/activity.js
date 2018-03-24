@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
         len: [1, 300]
       }
+    },
+
+    imageurl:{
+      type: DataTypes.STRING,
     }
   });
 

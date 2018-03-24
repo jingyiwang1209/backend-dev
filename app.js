@@ -4,6 +4,7 @@ const app = express();
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const routes = require("./server/routes/routes");
+const uploadRoutes = require("./server/routes/uploadRoutes");
 
 app.use(logger("dev"));
 
@@ -26,6 +27,7 @@ app.use(cors({
 
 
 routes(app);
+uploadRoutes(app);
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 app.get("*", (req, res) =>

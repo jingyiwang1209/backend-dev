@@ -96,7 +96,11 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmpty: true
       }
-    }
+    },
+
+    imageurl: {
+        type: DataTypes.STRING
+      },
   });
 
   User.associate = function(models) {
