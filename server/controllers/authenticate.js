@@ -4,17 +4,14 @@ const jwt = require("jwt-simple");
 const keys = require("../config/keys");
 const qs = require("qs");
 
-
 const generateToken = user => {
     const timestamp = new Date().getTime();
     return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
 
-
-
 module.exports.verifySignupEmail = (req, res, next) => {
     let email = qs.parse(req.query).email;
-    if(!email){
+    if (!email) {
         res.send(false);
         return;
     }
@@ -29,40 +26,41 @@ module.exports.verifySignupEmail = (req, res, next) => {
     });
 };
 module.exports.signup = (req, res, next) => {
-        const {
-            email,
-            password,
-            username,
-            sex,
-            age,
-            city,
-            yearOfLiving,
-            hometown,
-            school,
-            major,
-            language,
-            hobby,
-            personality
-        } = req.body;
+    const {
+        email,
+        password,
+        username,
+        sex,
+        age,
+        city,
+        yearOfLiving,
+        hometown,
+        school,
+        major,
+        language,
+        hobby,
+        personality
+    } = req.body;
 
-        User.findOrCreate({
-            where: { mail: email },
-            defaults: {
-                mail: email,
-                password: password,
-                username: username,
-                sex: sex,
-                age: age,
-                city: city,
-                yearOfLiving: yearOfLiving,
-                hometown: hometown,
-                school: school,
-                major: major,
-                language: language,
-                hobby: hobby,
-                personality: personality
-            }
-        }).spread((user, created) => {
+    User.findOrCreate({
+        where: { mail: email },
+        defaults: {
+            mail: email,
+            password: password,
+            username: username,
+            sex: sex,
+            age: age,
+            city: city,
+            yearOfLiving: yearOfLiving,
+            hometown: hometown,
+            school: school,
+            major: major,
+            language: language,
+            hobby: hobby,
+            personality: personality
+        }
+    })
+        .spread((user, created) => {
             if (!created) {
                 res.send("该邮箱已经存在!");
             } else {
@@ -71,10 +69,10 @@ module.exports.signup = (req, res, next) => {
 
                 res.send({ token, userName: user.dataValues.username });
             }
-        }).catch((e)=>{
-            next(e)
+        })
+        .catch(e => {
+            next(e);
         });
-
 };
 
 module.exports.login = (req, res, next) => {
@@ -105,52 +103,75 @@ module.exports.updateBasic = (req, res, next) => {
     const userId = req.user.id;
     const updates = req.body;
 
+    console.log("updates", updates);
+
     // console.log("updatesdata", updates);
     // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
-    let { key, value } = updates;
-    User.findById(userId).then(user => {
-        if (!user) {
-            res.send("该用户不存在");
-        } else {
-            if (key === "mail") {
-                User.findOne({
-                    where: {
-                        mail: value
-                    }
-                }).then(result => {
-                    if (result) {
-                        res.send(value + "已被使用");
-                    } else {
-                        // console.log("user!!!!", user);
+    let key;
+    let value;
+    if (updates.hasOwnProperty("imageurl")) {
+        (key = "imageurl"), (value = updates.imageurl);
+    } else {
+        key = updates.key;
+        value = updates.value;
+    }
+
+    console.log("key, value", key, value);
+
+    User.findById(userId)
+        .then(user => {
+            if (!user) {
+                res.send("该用户不存在");
+            } else {
+                if (key === "mail") {
+                    User.findOne({
+                        where: {
+                            mail: value
+                        }
+                    }).then(result => {
+                        if (result) {
+                            res.send(value + "已被使用");
+                        } else {
+                            // console.log("user!!!!", user);
+                            user
+                                .update({
+                                    mail: value
+                                })
+                                .then(updatedUser => {
+                                    // [1]
+                                    res.send([key, value]);
+                                });
+                        }
+                    });
+                } else {
+                    // beforeUpdate uses on user instance, not User model!!!!!
+                    if (key === "password") {
+                        user.cryptPassword(value).then(result => {
+                            user.update({
+                                password: result
+                            });
+                        });
+                    } else if (key === "imageurl") {
                         user
                             .update({
-                                mail: value
+                                imageurl: value
+                            })
+                            .then(updatedUser => {
+                                // console.log("updatedUser", updatedUser);
+                                res.send(["imageurl", value])
+                            });
+                    } else {
+                        user
+                            .update({
+                                [key]: value
                             })
                             .then(updatedUser => {
                                 // [1]
                                 res.send([key, value]);
                             });
                     }
-                });
-            } else {
-                // beforeUpdate uses on user instance, not User model!!!!!
-                if (key === "password") {
-                    user.cryptPassword(value).then(result => {
-                        user.update({
-                            password: result
-                        });
-                    });
-                } else {
-                    user
-                        .update({
-                            [key]: value
-                        })
-                        .then(updatedUser => {
-                            // [1]
-                            res.send([key, value]);
-                        });
                 }
             }
-        }
-    }).catch((e)=>next(e));
+        })
+        .catch(e => next(e));
 };

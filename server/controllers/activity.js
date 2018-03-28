@@ -77,7 +77,7 @@ module.exports.addActivity = (req, res, next) => {
             if (!created) {
                 res.send("你已经提交过同样的活动了！");
             } else {
-                res.send("活动被成功创建!");
+                res.send({ activityId: activity.id });
             }
         })
         .catch(e => next(e));
@@ -99,7 +99,10 @@ module.exports.fetchUserActivities = async (req, res, next) => {
 
     let data = [];
     Activity.findAll({
-        where: { userId }
+        where: {
+            userId,
+            deleteIt: false
+        }
     })
         .then(result => {
             if (result && result.length > 0) {
@@ -162,7 +165,12 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
         res.end();
         return null;
     }
-    Activity.findById(activityId)
+    Activity.findOne({
+        where: {
+            id: activityId,
+            deleteIt: false
+        }
+    })
         .then(result => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
@@ -195,7 +203,8 @@ module.exports.updateUserActivity = (req, res, next) => {
         Activity.findOne({
             where: {
                 id: activityId,
-                userId
+                userId,
+                deleteIt: false
             }
         })
             .then(result => {
@@ -203,10 +212,10 @@ module.exports.updateUserActivity = (req, res, next) => {
                     return res.send("该活动不存在或者你没有修改权限!");
                 } else {
                     if (result.imageurl) {
-                        // console.log("oldimageurl", result.imageurl);
-                        res.send({ oldimageurl: result.imageurl });
+                        res.send({});
+                    }else{
+                        res.send({})
                     }
-
                     return result.update({ imageurl: edittedValues.imageurl });
                 }
             })
@@ -251,10 +260,10 @@ module.exports.deleteUserActivity = (req, res, next) => {
             if (!result) {
                 res.send("你没有权限或者该活动不存在");
             } else {
-                res.send({ imgurl: result.imageurl });
-                result.destroy().then(() => {
-                    console.log("done");
+                result.update({
+                    deleteIt: true
                 });
+                res.send({ imgurl: result.imageurl });
             }
         })
         .catch(e => {
@@ -283,7 +292,11 @@ module.exports.deleteUserActivity = (req, res, next) => {
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
     let response = [];
-    Activity.findAll()
+    Activity.findAll({
+        where: {
+            deleteIt: false
+        }
+    })
         .then(activities => {
             let length = activities.length;
             for (let i = 0; i < length; i++) {
@@ -349,11 +362,11 @@ module.exports.fetchOneActivity = (req, res, next) => {
     let data;
     Activity.findById(activityId)
         .then(activity => {
-            if (activity) {
+            if (activity && activity.deleteIt === false) {
                 data = activity.dataValues;
                 return data;
             } else {
-                res.send({ warning: "该活动不存在" });
+                res.send({ warning: "该活动不存在或者已经被删除" });
                 res.end();
                 return null;
             }

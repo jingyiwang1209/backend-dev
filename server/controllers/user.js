@@ -85,7 +85,8 @@ module.exports.fetchUser = (req, res, next) => {
             "major",
             "language",
             "hobby",
-            "personality"
+            "personality",
+            "imageurl"
         ]
     }).then(user => {
         if (!user) {

@@ -49,6 +49,10 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: false,
         len: [0, 300]
       }
+    },
+    deleteIt: {
+      type: DataTypes.BOOLEAN,
+      defaultValue:false,
     }
   });
 

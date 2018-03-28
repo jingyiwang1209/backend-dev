@@ -69,6 +69,10 @@ module.exports = {
         type: Sequelize.STRING
       },
 
+      deleteIt:{
+        type:Sequelize.BOOLEAN
+      },
+
       createdAt: {
         type: Sequelize.DATE
       },

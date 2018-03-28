@@ -2,7 +2,6 @@ const Wish = require("../models").Wish;
 const User = require("../models").User;
 const WishLikes = require("../models").WishLikes;
 
-
 module.exports.fetchUserWishes = (req, res, next) => {
     if (Number.isNaN(parseInt(req.params.userId))) {
         res.send(["输入地址无效"]);
@@ -19,13 +18,16 @@ module.exports.fetchUserWishes = (req, res, next) => {
 
     let data = [];
     Wish.findAll({
-        where: { userId }
+        where: {
+            userId,
+            deleteIt: false
+        }
     })
         .then(result => {
             if (result && result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
                     let value = result[i].dataValues;
-                    if (req.user.id === value.userId){
+                    if (req.user.id === value.userId) {
                         value["areYourWishes"] = true;
                     }
                     data.push(value);
@@ -41,7 +43,7 @@ module.exports.fetchUserWishes = (req, res, next) => {
             if (!prevResult) {
                 return null;
             }
-            console.log(data)
+            console.log(data);
             res.send(data);
         })
         .catch(e => next(e));
@@ -55,7 +57,12 @@ module.exports.fetchWishForEditting = (req, res, next) => {
         res.end();
         return null;
     }
-    Wish.findById(wishId)
+    Wish.findOne({
+        where: {
+            id: wishId,
+            deleteIt: false
+        }
+    })
         .then(result => {
             if (result) {
                 // make sure the current logged user is the one who created the wish
@@ -77,7 +84,7 @@ module.exports.updateUserWish = (req, res, next) => {
     const userId = req.user.id;
     const edittedValues = req.body;
     // 7 { services: [ '徒步旅行', '汽车接送' ] }
-    console.log("edittedValues", edittedValues)
+    console.log("edittedValues", edittedValues);
     if (Number.isNaN(parseInt(wishId))) {
         res.send("输入地址无效");
         res.end();
@@ -87,14 +94,14 @@ module.exports.updateUserWish = (req, res, next) => {
     Wish.update(edittedValues, {
         where: {
             id: wishId,
-            userId
+            userId,
+            deleteIt: false
         }
     })
         .then(result => {
             // [1]
             if (result && result.length === 1) {
                 res.send("修改成功！");
-
             } else {
                 res.send("该愿望不存在或者你没有修改权限!");
             }
@@ -113,20 +120,21 @@ module.exports.deleteUserWish = (req, res, next) => {
         return null;
     }
     const userId = req.user.id;
-    Wish.destroy({
+    Wish.findOne({
         where: {
             id: wishId,
-            userId
+            userId,
+            deleteIt: false
         }
     })
         .then(result => {
-            // console.log("Result",result)
-            if (result === 1) {
+            if (result) {
+                result.update({
+                    deleteIt: true
+                });
                 res.send("成功删除该愿望");
-            }
-             // result === 0
-            else {
-               res.send("该愿望不存在或者你没有权限修改");
+            } else {
+                res.send("该愿望不存在或者你没有权限修改");
             }
         })
         .catch(e => {
@@ -134,9 +142,16 @@ module.exports.deleteUserWish = (req, res, next) => {
         });
 };
 
-
 module.exports.addWish = (req, res, next) => {
-    const { location, departdate, finishdate, budget, numberOfPeople, services, note } = req.body;
+    const {
+        location,
+        departdate,
+        finishdate,
+        budget,
+        numberOfPeople,
+        services,
+        note
+    } = req.body;
     const userId = req.user.id;
     // console.log("userId", userId);
     Wish.findOrCreate({
@@ -174,7 +189,11 @@ module.exports.addWish = (req, res, next) => {
 module.exports.fetchWish = (req, res, next) => {
     const data = [];
 
-    Wish.findAll()
+    Wish.findAll({
+        where: {
+            deleteIt: false
+        }
+    })
         .then(wishes => {
             const length = wishes.length;
             for (var i = 0; i < wishes.length; i++) {
@@ -213,7 +232,12 @@ module.exports.fetchOneWish = (req, res, next) => {
         return null;
     }
     let data;
-    Wish.findById(wishId)
+    Wish.findOne({
+        where: {
+            id: wishId,
+            deleteIt: false
+        }
+    })
         .then(wish => {
             if (wish) {
                 data = wish.dataValues;
@@ -233,15 +257,16 @@ module.exports.fetchOneWish = (req, res, next) => {
                 .then(user => {
                     data.username = user.username;
                     data.mail = user.mail;
-                    if(user.id === userId){
+                    if (user.id === userId) {
                         data.isYourWish = true;
                     }
                 })
                 .then(() => {
-                    console.log("wish", data)
+                    console.log("wish", data);
                     res.send(data);
                 });
-        }).catch((e)=>next(e))
+        })
+        .catch(e => next(e));
 };
 // { id: 3,
 //   location: '唐山市 河北省',
@@ -264,29 +289,34 @@ module.exports.wishLikes = (req, res, next) => {
     const userId = req.user.id;
     const userMarker = userId + ";";
     const result = {};
-    WishLikes.findOne({ where: { wishId } }).then(wishLike => {
-        if (wishLike.userMarkers.includes(userMarker)) {
-            wishLike
-                .update({
-                    userMarkers: wishLike.userMarkers.replace(userMarker, ""),
-                    numOfLikes: wishLike.numOfLikes - 1
-                })
-                .then(() => {
-                    result[wishId] = wishLike.numOfLikes;
-                    console.log(result);
-                    res.send(result);
-                });
-        } else {
-            wishLike
-                .update({
-                    userMarkers: wishLike.userMarkers + userMarker,
-                    numOfLikes: wishLike.numOfLikes + 1
-                })
-                .then(() => {
-                    result[wishId] = wishLike.numOfLikes;
-                    console.log(result);
-                    res.send(result);
-                });
-        }
-    }).catch((e)=>next(e))
+    WishLikes.findOne({ where: { wishId } })
+        .then(wishLike => {
+            if (wishLike.userMarkers.includes(userMarker)) {
+                wishLike
+                    .update({
+                        userMarkers: wishLike.userMarkers.replace(
+                            userMarker,
+                            ""
+                        ),
+                        numOfLikes: wishLike.numOfLikes - 1
+                    })
+                    .then(() => {
+                        result[wishId] = wishLike.numOfLikes;
+                        console.log(result);
+                        res.send(result);
+                    });
+            } else {
+                wishLike
+                    .update({
+                        userMarkers: wishLike.userMarkers + userMarker,
+                        numOfLikes: wishLike.numOfLikes + 1
+                    })
+                    .then(() => {
+                        result[wishId] = wishLike.numOfLikes;
+                        console.log(result);
+                        res.send(result);
+                    });
+            }
+        })
+        .catch(e => next(e));
 };
