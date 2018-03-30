@@ -1,6 +1,9 @@
 const Wish = require("../models").Wish;
 const User = require("../models").User;
 const WishLikes = require("../models").WishLikes;
+const moment = require("moment");
+require("moment/locale/zh-cn.js");
+moment.locale('zh-cn');
 
 module.exports.fetchUserWishes = (req, res, next) => {
     if (Number.isNaN(parseInt(req.params.userId))) {
@@ -67,7 +70,11 @@ module.exports.fetchWishForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the wish
                 if (result.dataValues.userId === req.user.id) {
-                    // console.log(result.dataValues)
+                    let departdate = moment(result.dataValues.departdate).format('lll');
+                    let finishdate = moment(result.dataValues.finishdate).format('lll');
+                    result.dataValues.departdate = departdate;
+                    result.dataValues.finishdate = finishdate;
+
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此愿望" });
@@ -197,6 +204,10 @@ module.exports.fetchWish = (req, res, next) => {
         .then(wishes => {
             const length = wishes.length;
             for (var i = 0; i < wishes.length; i++) {
+                let departdate = moment(wishes[i].dataValues.departdate).format('lll');
+                let finishdate = moment(wishes[i].dataValues.finishdate).format('lll');
+                wishes[i].dataValues.departdate = departdate;
+                wishes[i].dataValues.finishdate = finishdate;
                 let wish = wishes[i].dataValues;
                 // console.log("wish", wish);
                 let wishId = wish.id;
@@ -240,6 +251,10 @@ module.exports.fetchOneWish = (req, res, next) => {
     })
         .then(wish => {
             if (wish) {
+                let departdate = moment(wish.dataValues.departdate).format('lll');
+                let finishdate = moment(wish.dataValues.finishdate).format('lll');
+                wish.dataValues.departdate = departdate;
+                wish.dataValues.finishdate = finishdate;
                 data = wish.dataValues;
                 return data;
             } else {
@@ -260,6 +275,7 @@ module.exports.fetchOneWish = (req, res, next) => {
                     if (user.id === userId) {
                         data.isYourWish = true;
                     }
+
                 })
                 .then(() => {
                     console.log("wish", data);
@@ -268,16 +284,7 @@ module.exports.fetchOneWish = (req, res, next) => {
         })
         .catch(e => next(e));
 };
-// { id: 3,
-//   location: '唐山市 河北省',
-//   departdate: '23 Feb 2018 11:15',
-//   finishdate: '01 Mar 2018 11:15',
-//   budget: '2000',
-//   services: [ '徒步旅行' ],
-//   createdAt: 2018-02-21T19:15:53.875Z,
-//   updatedAt: 2018-02-21T19:15:53.875Z,
-//   userId: 6,
-//   username: 'Robert' }
+
 
 module.exports.wishLikes = (req, res, next) => {
     const { wishId } = req.params;

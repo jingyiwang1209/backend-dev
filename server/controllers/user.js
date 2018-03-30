@@ -1,5 +1,8 @@
 const User = require("../models").User;
 const Rating = require("../models").Rating;
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+
 
 module.exports.fetchComments = (req, res, next) => {
     let creatorId;
@@ -16,6 +19,7 @@ module.exports.fetchComments = (req, res, next) => {
         creatorId = req.user.id;
     }
 
+    let users = []
     Rating.findAndCountAll({
         where: {
             creatorId
@@ -30,31 +34,31 @@ module.exports.fetchComments = (req, res, next) => {
             let total = 0;
             result.rows.forEach(item => {
                 // console.log("item", item.dataValues);
+                users.push(item.dataValues.userId);
                 total += item.numOfStars;
                 data.push(item.dataValues);
             });
             let average = Math.floor(total / result.count * 100) / 100;
-
             data[0].average = average;
-            // console.log("Data",data)
-            //      [ { id: 61,
-            //   feedback: '非常棒！！',
-            //   numOfStars: 5,
-            //   userId: 35,
-            //   activityId: 18,
-            //   createdAt: 2018-03-18T09:20:19.214Z,
-            //   updatedAt: 2018-03-18T09:20:19.214Z,
-            //   creatorId: 31,
-            //   average: 4.5 },
-            // { id: 58,
-            //   feedback: '哥斯拉亲切和蔼，非常专业！',
-            //   numOfStars: 4,
-            //   userId: 36,
-            //   activityId: 18,
-            //   createdAt: 2018-03-18T09:17:42.570Z,
-            //   updatedAt: 2018-03-18T09:17:42.570Z,
-            //   creatorId: 31 } ]
-            res.send(data);
+            data[0].count = result.count;
+
+            User.findAll({
+                where:{
+                    id:{
+                        [Op.or]: users
+                    }
+                }
+            }).then((result)=>{
+                if(result){
+                    result.forEach((user, index)=>{
+                        data[index].username = user.dataValues.username;
+                        data[index].imageurl = user.dataValues.imageurl;
+                    });
+                }
+                 // console.log("Data",data)
+                 res.send(data);
+            });
+
         }
     });
 };

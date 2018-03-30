@@ -5,6 +5,9 @@ const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
 const passport = require("passport");
 const requireAuth = passport.authenticate("jwt", { session: false });
+const moment = require("moment");
+require("moment/locale/zh-cn.js");
+moment.locale('zh-cn');
 
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
@@ -107,6 +110,7 @@ module.exports.fetchUserActivities = async (req, res, next) => {
         .then(result => {
             if (result && result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
+
                     let value = result[i].dataValues;
                     // just in case in the future the page needs to add some thing different for the user who created the activities
                     if (req.user.id === value.userId) {
@@ -125,37 +129,11 @@ module.exports.fetchUserActivities = async (req, res, next) => {
             if (!prevResult) {
                 return null;
             }
-            // console.log(data)
-            //     [ { id: 7,
-            // theme: '大连城市风光游',
-            // location: '大连市 辽宁省',
-            // departdate: '23 Feb 2018 6:16',
-            // finishdate: '28 Feb 2018 6:16',
-            // budget: '5000',
-            // services: [ '徒步旅行', '汽车接送', '购物打折' ],
-            // story: '我在大连生活了10年。这里的一山一水一草一木都充满了灵性。大连是一个热情，开方，时尚的城市。海纳百川，兼容并蓄。',
-            // images: [],
-            // createdAt: 2018-02-21T02:18:16.284Z,
-            // updatedAt: 2018-02-21T02:18:16.284Z,
-            // userId: 6 } ]
-            // console.log("data", data);
             res.send(data);
         })
         .catch(e => next(e));
 };
 
-// { id: 12,
-//   theme: '北京三日游',
-//   location: '北京市 北京市',
-//   departdate: '23 Mar 2018 9:45',
-//   finishdate: '31 Mar 2018 9:45',
-//   budget: '5000',
-//   services: [ '徒步旅行', '购物打折' ],
-//   story: '我在北京呆了2年，对北京文化，景点念念不忘。北京的景点大气辉煌，充满历史感。我一定会带你领略中华在过去的帝国风采。',
-//   imageurl: 'xxxxxxxxxxxxxxx',
-//   createdAt: 2018-03-01T17:48:00.606Z,
-//   updatedAt: 2018-03-01T17:48:00.606Z,
-//   userId: 9 }
 
 module.exports.fetchActivityForEditting = (req, res, next) => {
     const id = req.user.id;
@@ -175,7 +153,10 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
                 if (result.dataValues.userId === req.user.id) {
-                    // console.log(result.dataValues)
+                    let departdate = moment(result.dataValues.departdate).format('lll');
+                    let finishdate = moment(result.dataValues.finishdate).format('lll');
+                    result.dataValues.departdate = departdate;
+                    result.dataValues.finishdate = finishdate;
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此活动" });
@@ -191,8 +172,7 @@ module.exports.updateUserActivity = (req, res, next) => {
     const { activityId } = req.params;
     const userId = req.user.id;
     const edittedValues = req.body;
-    // 7 { services: [ '徒步旅行', '汽车接送' ] }
-    // console.log("edittedValues", edittedValues)
+
     if (Number.isNaN(parseInt(activityId))) {
         res.send("输入地址无效");
         res.end();
@@ -211,11 +191,7 @@ module.exports.updateUserActivity = (req, res, next) => {
                 if (!result) {
                     return res.send("该活动不存在或者你没有修改权限!");
                 } else {
-                    if (result.imageurl) {
-                        res.send({});
-                    }else{
-                        res.send({})
-                    }
+                    res.send({})
                     return result.update({ imageurl: edittedValues.imageurl });
                 }
             })
@@ -270,24 +246,6 @@ module.exports.deleteUserActivity = (req, res, next) => {
             next(e);
         });
 
-    // Activity.destroy({
-    //     where: {
-    //         id: activityId,
-    //         userId
-    //     }
-    // })
-    //     .then(result => {
-    //         // console.log("Result",result)
-    //         if (result === 1) {
-    //             res.send("成功删除该活动");
-    //         } else {
-    //             // result === 0
-    //             res.send("你没有权限或者该活动不存在");
-    //         }
-    //     })
-    //     .catch(e => {
-    //         next(e);
-    //     });
 };
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
@@ -300,6 +258,10 @@ module.exports.fetchActivity = (req, res, next) => {
         .then(activities => {
             let length = activities.length;
             for (let i = 0; i < length; i++) {
+                let departdate = moment(activities[i].dataValues.departdate).format('lll');
+                let finishdate = moment(activities[i].dataValues.finishdate).format('lll');
+                activities[i].dataValues.departdate = departdate;
+                activities[i].dataValues.finishdate = finishdate;
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;
@@ -363,6 +325,10 @@ module.exports.fetchOneActivity = (req, res, next) => {
     Activity.findById(activityId)
         .then(activity => {
             if (activity && activity.deleteIt === false) {
+                let departdate = moment(activity.dataValues.departdate).format('lll');
+                let finishdate = moment(activity.dataValues.finishdate).format('lll');
+                activity.dataValues.departdate = departdate;
+                activity.dataValues.finishdate = finishdate;
                 data = activity.dataValues;
                 return data;
             } else {
