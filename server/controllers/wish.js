@@ -271,6 +271,7 @@ module.exports.fetchOneWish = (req, res, next) => {
             User.findById(data.userId)
                 .then(user => {
                     data.username = user.username;
+                    data.userimageurl = user.imageurl
                     data.mail = user.mail;
                     if (user.id === userId) {
                         data.isYourWish = true;
