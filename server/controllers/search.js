@@ -17,7 +17,8 @@ module.exports.fetchSearchData = (req, res, next) => {
     if (category === "活动") {
         Activity.findAndCountAll({
             where: {
-                location: location
+                location: location,
+                deleteIt:false
             }
         }).then(result => {
             let length = result.count;
@@ -62,7 +63,8 @@ module.exports.fetchSearchData = (req, res, next) => {
     } else if (category === "愿望") {
         Wish.findAndCountAll({
             where: {
-                location: location
+                location: location,
+                deleteIt:false
             }
         })
             .then(result => {
