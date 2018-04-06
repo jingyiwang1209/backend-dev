@@ -42,7 +42,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
-        isNumeric: true
+        isNumeric: true,
+        min:1
       }
     },
     services: {
