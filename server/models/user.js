@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notEmpty: true,
-        isEmail:true
+        isEmail: true
       }
     },
     password: {
@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [8,25],
-        is: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,25}$/,
+        len: [8, 25],
+        is: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,25}$/
       }
     },
     username: {
@@ -36,11 +36,21 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     age: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isNumeric: true,
-        min: 18
+        isIn: [
+          [
+            "18 岁 ~ 23 岁",
+            "24 岁 ~ 29 岁",
+            "30 岁 ~ 35 岁",
+            "36 岁 ~ 41 岁",
+            "42 岁 ~ 47 岁",
+            "48 岁 ~ 53 岁",
+            "54 岁 ~ 59 岁",
+            "60 岁 ~ 65 岁"
+          ]
+        ]
       }
     },
     city: {
@@ -101,8 +111,8 @@ module.exports = (sequelize, DataTypes) => {
     },
 
     imageurl: {
-        type: DataTypes.STRING
-      },
+      type: DataTypes.STRING
+    }
   });
 
   User.associate = function(models) {
