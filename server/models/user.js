@@ -17,27 +17,26 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [8, 25],
-        is: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,25}$/
       }
     },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true
+        notEmpty: true,
+        len: [1, 20]
       }
     },
     sex: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         isIn: [["男", "女", "其他"]]
       }
     },
     age: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         isIn: [
           [
@@ -55,56 +54,44 @@ module.exports = (sequelize, DataTypes) => {
     },
     city: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true
       }
     },
     yearOfLiving: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
-        notEmpty: true
+        isIn: [["1 年 ~ 5 年", "6 年 ~ 10 年", "10 年以上"]]
       }
     },
-    hometown: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true
-      }
-    },
+
     school: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true
       }
     },
-    major: {
+    occupation: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true
       }
     },
     language: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      defaultValue: [],
+      allowNull: true,
       validate: {
         notEmpty: true
       }
     },
-    hobby: {
+    bio: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true
-      }
-    },
-    personality: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true
       }

@@ -20,26 +20,26 @@ module.exports = {
         allowNull: false,
         validate: {
           notEmpty: true,
-          len: 6
         }
       },
       username: {
         type: Sequelize.STRING,
         allowNull: false,
         validate: {
-          notEmpty: true
+          notEmpty: true,
+          len: [1, 20]
         }
       },
       sex: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isIn: [["男", "女", "其他"]]
         }
       },
       age: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isIn: [
             [
@@ -57,58 +57,48 @@ module.exports = {
       },
       city: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           notEmpty: true
         }
       },
       yearOfLiving: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      hometown: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
-          notEmpty: true
+          isIn: [["1 年 ~ 5 年", "6 年 ~ 10 年", "10 年以上"]]
         }
       },
+
       school: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           notEmpty: true
         }
       },
-      major: {
+      occupation: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           notEmpty: true
         }
       },
       language: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.TEXT),
+        defaultValue: [],
+        allowNull: true,
         validate: {
           notEmpty: true
         }
       },
-      hobby: {
+      bio: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           notEmpty: true
         }
       },
-      personality: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true
-        }
-      },
-
       imageurl: {
         type: Sequelize.STRING
       },

@@ -2,6 +2,7 @@ const passportService = require("../middleware/passport");
 const passport = require("passport");
 
 const signupController = require("../controllers/authenticate").signup;
+const completeUserProfile = require("../controllers/authenticate").completeUserProfile;
 const verifySignupEmail = require("../controllers/authenticate").verifySignupEmail;
 const updateBasic = require("../controllers/authenticate").updateBasic;
 
@@ -47,8 +48,8 @@ const requireAuth = passport.authenticate("jwt", { session: false });
 const requireLogin = passport.authenticate("local", { session: false });
 
 module.exports = app => {
-    app.get("/api/verifySignupEmail?:query", verifySignupEmail);
     app.post("/api/signup", signupController);
+    app.post("/api/completeUserProfile", requireAuth, completeUserProfile);
     app.post("/api/login", requireLogin, loginController);
     app.post("/api/updateBasicInfo", requireAuth, updateBasic);
     app.get("/api/user/:userId", requireAuth, fetchUser);

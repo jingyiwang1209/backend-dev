@@ -9,70 +9,47 @@ const generateToken = user => {
     return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 };
 
-module.exports.verifySignupEmail = (req, res, next) => {
-    let email = qs.parse(req.query).email;
-    if (!email) {
-        res.send(false);
-        return;
-    }
-    User.findOne({
-        where: { mail: email }
-    }).then(user => {
-        if (user) {
-            res.send(false);
-        } else {
-            res.send(true);
-        }
-    });
-};
 module.exports.signup = (req, res, next) => {
-    const {
-        email,
-        password,
-        username,
-        sex,
-        age,
-        city,
-        yearOfLiving,
-        hometown,
-        school,
-        major,
-        language,
-        hobby,
-        personality
-    } = req.body;
-
+    const { email, password, username } = req.body;
     User.findOrCreate({
-        where: { mail: email },
+        where: {
+            mail: email
+        },
         defaults: {
             mail: email,
             password: password,
-            username: username,
-            sex: sex,
-            age: age,
-            city: city,
-            yearOfLiving: yearOfLiving,
-            hometown: hometown,
-            school: school,
-            major: major,
-            language: language,
-            hobby: hobby,
-            personality: personality
+            username: username
         }
-    })
-        .spread((user, created) => {
-            if (!created) {
-                res.send("该邮箱已经存在!");
-            } else {
-                let token = generateToken(user);
-                // username for showing greeting to user on frontend(localStorage)
+    }).spread((user, created) => {
+        if (!created) {
+            res.send("该邮箱已经存在!!!");
+        } else {
+            let token = generateToken(user);
+            // username for showing greeting to user on frontend(localStorage)
+            res.send({ token, userName: user.dataValues.username });
+        }
+    });
+};
 
-                res.send({ token, userName: user.dataValues.username });
-            }
-        })
-        .catch(e => {
-            next(e);
-        });
+module.exports.completeUserProfile = (req, res, next) => {
+    const userId = req.user.id;
+    console.log(userId, req.body);
+    const completedValues = req.body;
+    User.findById(userId).then(user => {
+        if (!user) {
+            res.send("该用户不存在");
+        } else {
+            user
+                .update(completedValues)
+                .then(updated => {
+                    console.log("updated");
+                    res.send("success");
+                })
+                .catch(e => {
+                    next(e);
+                });
+        }
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -82,93 +59,66 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.updateBasic = (req, res, next) => {
-    // get user from passport
-    // req.user:
-    //    { id: 6,
-    // mail: 'robert@gmail.com',
-    // password: '$2a$10$bqeLmIeOYu/prAGamSP0s.cIuLyVpktpqdeCsXCa0KVpRASQhzFlW',
-    // username: '哥斯拉',
-    // sex: '男',
-    // age: 40,
-    // city: 'San Francisco',
-    // yearOfLiving: 15,
-    // hometown: '旧金山',
-    // school: '加大伯克利分校',
-    // major: '机械工程，材料科学',
-    // language: '良好',
-    // hobby: '汽车',
-    // personality: '快乐',
-    // createdAt: 2018-01-02T06:43:37.753Z,
-    // updatedAt: 2018-02-26T21:00:40.142Z }
     const userId = req.user.id;
     const updates = req.body;
 
     console.log("updates", updates);
 
-    // console.log("updatesdata", updates);
-    // 23 { userId: 23, key: 'mail', value: 'shizuwang1209@gmail.co' }
-    let key;
-    let value;
+    let pair;
     if (updates.hasOwnProperty("imageurl")) {
-        (key = "imageurl"), (value = updates.imageurl);
+        pair = {
+            imageurl: updates.imageurl
+        };
+    } else if (updates.hasOwnProperty("password")) {
+        pair = {
+            password: updates.password
+        };
     } else {
-        key = updates.key;
-        value = updates.value;
+        pair = req.body;
     }
 
-    console.log("key, value", key, value);
+    console.log("pair", pair);
 
     User.findById(userId)
         .then(user => {
             if (!user) {
                 res.send("该用户不存在");
             } else {
-                if (key === "mail") {
+                if (pair.hasOwnProperty("email")) {
                     User.findOne({
                         where: {
-                            mail: value
+                            mail: pair.email
                         }
                     }).then(result => {
                         if (result) {
-                            res.send(value + "已被使用");
+                            res.send(pair.email + "已被使用");
                         } else {
                             // console.log("user!!!!", user);
-                            user
-                                .update({
-                                    mail: value
-                                })
-                                .then(updatedUser => {
-                                    // [1]
-                                    res.send([key, value]);
-                                });
+                            user.update(pair).then(updatedUser => {
+                                // [1]
+                                res.send("修改成功！");
+                            });
                         }
                     });
                 } else {
                     // beforeUpdate uses on user instance, not User model!!!!!
-                    if (key === "password") {
-                        user.cryptPassword(value).then(result => {
-                            user.update({
-                                password: result
-                            });
+                    if (pair.hasOwnProperty("password")) {
+                        user.cryptPassword(pair.password).then(result => {
+                            user
+                                .update({ password: result })
+                                .then(updatedUser => {
+                                    res.send("");
+                                });
                         });
-                    } else if (key === "imageurl") {
-                        user
-                            .update({
-                                imageurl: value
-                            })
-                            .then(updatedUser => {
-                                // console.log("updatedUser", updatedUser);
-                                res.send(["imageurl", value])
-                            });
+                    } else if (pair.hasOwnProperty("imageurl")) {
+                        user.update(pair).then(updatedUser => {
+                            res.send("");
+                        });
                     } else {
-                        user
-                            .update({
-                                [key]: value
-                            })
-                            .then(updatedUser => {
-                                // [1]
-                                res.send([key, value]);
-                            });
+                        user.update(pair).then(updatedUser => {
+                            // [1]
+                            res.send("修改成功！");
+                        });
                     }
                 }
             }
