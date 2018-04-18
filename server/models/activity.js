@@ -38,12 +38,20 @@ module.exports = (sequelize, DataTypes) => {
         isNumeric: true
       }
     },
-    numberOfPeople: {
+    minNumOfPeople: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
-        isNumeric: true,
-        min:1
+        notEmpty: true,
+        isNumeric: true
+      }
+    },
+    maxNumOfPeople: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isNumeric: true
       }
     },
     services: {
@@ -60,13 +68,13 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
 
-    imageurl:{
-      type: DataTypes.STRING,
+    imageurl: {
+      type: DataTypes.STRING
     },
 
     deleteIt: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false,
+      defaultValue: false
     }
   });
 

@@ -7,7 +7,7 @@ const passport = require("passport");
 const requireAuth = passport.authenticate("jwt", { session: false });
 const moment = require("moment");
 require("moment/locale/zh-cn.js");
-moment.locale('zh-cn');
+moment.locale("zh-cn");
 
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
@@ -42,7 +42,8 @@ module.exports.addActivity = (req, res, next) => {
         departdate,
         finishdate,
         budget,
-        numberOfPeople,
+        minNumOfPeople,
+        maxNumOfPeople,
         services,
         story,
         imageurl
@@ -57,7 +58,8 @@ module.exports.addActivity = (req, res, next) => {
             departdate,
             finishdate,
             budget,
-            numberOfPeople,
+            minNumOfPeople,
+            maxNumOfPeople,
             services,
             story,
             imageurl,
@@ -69,7 +71,8 @@ module.exports.addActivity = (req, res, next) => {
             departdate,
             finishdate,
             budget,
-            numberOfPeople,
+            minNumOfPeople,
+            maxNumOfPeople,
             services,
             story,
             imageurl,
@@ -110,7 +113,6 @@ module.exports.fetchUserActivities = async (req, res, next) => {
         .then(result => {
             if (result && result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
-
                     let value = result[i].dataValues;
                     // just in case in the future the page needs to add some thing different for the user who created the activities
                     if (req.user.id === value.userId) {
@@ -134,7 +136,6 @@ module.exports.fetchUserActivities = async (req, res, next) => {
         .catch(e => next(e));
 };
 
-
 module.exports.fetchActivityForEditting = (req, res, next) => {
     const id = req.user.id;
     const { activityId } = req.params;
@@ -153,8 +154,12 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
                 if (result.dataValues.userId === req.user.id) {
-                    let departdate = moment(result.dataValues.departdate).format('lll');
-                    let finishdate = moment(result.dataValues.finishdate).format('lll');
+                    let departdate = moment(
+                        result.dataValues.departdate
+                    ).format("lll");
+                    let finishdate = moment(
+                        result.dataValues.finishdate
+                    ).format("lll");
                     result.dataValues.departdate = departdate;
                     result.dataValues.finishdate = finishdate;
                     res.send(result.dataValues);
@@ -191,7 +196,7 @@ module.exports.updateUserActivity = (req, res, next) => {
                 if (!result) {
                     return res.send("该活动不存在或者你没有修改权限!");
                 } else {
-                    res.send({})
+                    res.send({});
                     return result.update({ imageurl: edittedValues.imageurl });
                 }
             })
@@ -200,7 +205,8 @@ module.exports.updateUserActivity = (req, res, next) => {
         Activity.update(edittedValues, {
             where: {
                 id: activityId,
-                userId
+                userId,
+                deleteIt: false
             }
         })
             .then(result => {
@@ -245,7 +251,6 @@ module.exports.deleteUserActivity = (req, res, next) => {
         .catch(e => {
             next(e);
         });
-
 };
 // Do with DEnormalization here???????????????
 module.exports.fetchActivity = (req, res, next) => {
@@ -258,8 +263,12 @@ module.exports.fetchActivity = (req, res, next) => {
         .then(activities => {
             let length = activities.length;
             for (let i = 0; i < length; i++) {
-                let departdate = moment(activities[i].dataValues.departdate).format('lll');
-                let finishdate = moment(activities[i].dataValues.finishdate).format('lll');
+                let departdate = moment(
+                    activities[i].dataValues.departdate
+                ).format("lll");
+                let finishdate = moment(
+                    activities[i].dataValues.finishdate
+                ).format("lll");
                 activities[i].dataValues.departdate = departdate;
                 activities[i].dataValues.finishdate = finishdate;
                 const data = activities[i].dataValues;
@@ -325,8 +334,12 @@ module.exports.fetchOneActivity = (req, res, next) => {
     Activity.findById(activityId)
         .then(activity => {
             if (activity && activity.deleteIt === false) {
-                let departdate = moment(activity.dataValues.departdate).format('lll');
-                let finishdate = moment(activity.dataValues.finishdate).format('lll');
+                let departdate = moment(activity.dataValues.departdate).format(
+                    "lll"
+                );
+                let finishdate = moment(activity.dataValues.finishdate).format(
+                    "lll"
+                );
                 activity.dataValues.departdate = departdate;
                 activity.dataValues.finishdate = finishdate;
                 data = activity.dataValues;

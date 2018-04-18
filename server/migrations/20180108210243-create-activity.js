@@ -45,10 +45,19 @@ module.exports = {
           isNumeric: true
         }
       },
-      numberOfPeople: {
+      minNumOfPeople: {
         type: Sequelize.INTEGER,
         allowNull: false,
         validate: {
+          notEmpty: true,
+          isNumeric: true
+        }
+      },
+      maxNumOfPeople: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
           isNumeric: true
         }
       },
@@ -69,8 +78,8 @@ module.exports = {
         type: Sequelize.STRING
       },
 
-      deleteIt:{
-        type:Sequelize.BOOLEAN
+      deleteIt: {
+        type: Sequelize.BOOLEAN
       },
 
       createdAt: {

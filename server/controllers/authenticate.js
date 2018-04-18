@@ -22,11 +22,10 @@ module.exports.signup = (req, res, next) => {
         }
     }).spread((user, created) => {
         if (!created) {
-            res.send("该邮箱已经存在!!!");
+            res.send("该邮箱已经存在");
         } else {
             let token = generateToken(user);
-            // username for showing greeting to user on frontend(localStorage)
-            res.send({ token, userName: user.dataValues.username });
+            res.send({ token });
         }
     });
 };
@@ -54,16 +53,12 @@ module.exports.completeUserProfile = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
     let user = req.user.dataValues;
-    // username for showing greeting to user on frontend(localStorage)
-    res.send({ token: generateToken(req.user), userName: user.username });
+    res.send({ token: generateToken(req.user) });
 };
 
 module.exports.updateBasic = (req, res, next) => {
     const userId = req.user.id;
     const updates = req.body;
-
-    console.log("updates", updates);
-
     let pair;
     if (updates.hasOwnProperty("imageurl")) {
         pair = {
@@ -77,7 +72,7 @@ module.exports.updateBasic = (req, res, next) => {
         pair = req.body;
     }
 
-    console.log("pair", pair);
+    // console.log("pair", pair);
 
     User.findById(userId)
         .then(user => {
