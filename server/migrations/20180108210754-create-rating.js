@@ -11,14 +11,28 @@ module.exports = {
 
       numOfStars: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isNumeric: true,
-          isIn: [[1,2,3,4,5]]
+          isIn: [[1, 2, 3, 4, 5]]
+        }
+      },
+      parentId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
+      },
+      replyToId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isNumeric: true
         }
       },
 
-       feedback: {
+      feedback: {
         type: Sequelize.STRING,
         allowNull: false,
         validate: {

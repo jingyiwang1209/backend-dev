@@ -1,8 +1,8 @@
 const User = require("../models").User;
+const Activity = require("../models").Activity;
 const Rating = require("../models").Rating;
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-
 
 module.exports.fetchComments = (req, res, next) => {
     let creatorId;
@@ -19,10 +19,13 @@ module.exports.fetchComments = (req, res, next) => {
         creatorId = req.user.id;
     }
 
-    let users = []
+    let users = [];
+    let activities = [];
     Rating.findAndCountAll({
         where: {
-            creatorId
+            creatorId,
+            parentId: 0,
+            replyToId: 0
         }
     }).then(result => {
         // console.log("Result", result)
@@ -33,8 +36,8 @@ module.exports.fetchComments = (req, res, next) => {
             let data = [];
             let total = 0;
             result.rows.forEach(item => {
-                // console.log("item", item.dataValues);
                 users.push(item.dataValues.userId);
+                activities.push(item.dataValues.activityId);
                 total += item.numOfStars;
                 data.push(item.dataValues);
             });
@@ -43,22 +46,46 @@ module.exports.fetchComments = (req, res, next) => {
             data[0].count = result.count;
 
             User.findAll({
-                where:{
-                    id:{
+                where: {
+                    id: {
                         [Op.or]: users
                     }
                 }
-            }).then((result)=>{
-                if(result){
-                    result.forEach((user, index)=>{
-                        data[index].username = user.dataValues.username;
-                        data[index].imageurl = user.dataValues.imageurl;
-                    });
+            }).then(users => {
+                if (users) {
+                    for (let i = 0; i < data.length; i++) {
+                        for (let j = 0; j < users.length; j++) {
+                            if (data[i].userId === users[j].dataValues.id) {
+                                data[i].username = users[j].dataValues.username;
+                                data[i].imageurl = users[j].dataValues.imageurl;
+                            }
+                        }
+                    }
                 }
-                 // console.log("Data",data)
-                 res.send(data);
-            });
+                Activity.findAll({
+                    where: {
+                        id: {
+                            [Op.or]: activities
+                        }
+                    }
+                }).then(activities => {
+                    if (activities) {
+                        for (let i = 0; i < data.length; i++) {
+                            for (let j = 0; j < activities.length; j++) {
+                                if (
+                                    data[i].activityId ===
+                                    activities[j].dataValues.id
+                                ) {
+                                    data[i].activityName =
+                                        activities[j].dataValues.theme;
+                                }
+                            }
+                        }
 
+                    }
+                    res.send(data);
+                });
+            });
         }
     });
 };
@@ -90,14 +117,16 @@ module.exports.fetchUser = (req, res, next) => {
             "bio",
             "imageurl"
         ]
-    }).then(user => {
-        if (!user) {
-            res.send({ warning: "该用户不存在" });
-            res.end();
-            return null;
-        } else {
-            console.log("userbasic", user.dataValues);
-            res.send(user.dataValues);
-        }
-    }).catch((e)=>next(e))
+    })
+        .then(user => {
+            if (!user) {
+                res.send({ warning: "该用户不存在" });
+                res.end();
+                return null;
+            } else {
+                // console.log("userbasic", user.dataValues);
+                res.send(user.dataValues);
+            }
+        })
+        .catch(e => next(e));
 };

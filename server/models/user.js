@@ -55,9 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     city: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        notEmpty: true
-      }
+
     },
     yearOfLiving: {
       type: DataTypes.STRING,
@@ -70,31 +68,21 @@ module.exports = (sequelize, DataTypes) => {
     school: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        notEmpty: true
-      }
     },
     occupation: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        notEmpty: true
-      }
+
     },
     language: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: [],
       allowNull: true,
-      validate: {
-        notEmpty: true
-      }
     },
     bio: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        notEmpty: true
-      }
+
     },
 
     imageurl: {

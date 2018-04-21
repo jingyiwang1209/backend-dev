@@ -3,10 +3,24 @@ module.exports = (sequelize, DataTypes) => {
   var Rating = sequelize.define("Rating", {
     numOfStars: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       validate: {
         isNumeric: true,
-        isIn: [[1,2,3,4,5]]
+        isIn: [[1, 2, 3, 4, 5]]
+      }
+    },
+    parentId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
+      }
+    },
+    replyToId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isNumeric: true
       }
     },
 

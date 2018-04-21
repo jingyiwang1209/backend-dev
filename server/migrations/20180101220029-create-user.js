@@ -58,9 +58,7 @@ module.exports = {
       city: {
         type: Sequelize.STRING,
         allowNull: true,
-        validate: {
-          notEmpty: true
-        }
+
       },
       yearOfLiving: {
         type: Sequelize.STRING,
@@ -73,31 +71,21 @@ module.exports = {
       school: {
         type: Sequelize.STRING,
         allowNull: true,
-        validate: {
-          notEmpty: true
-        }
+
       },
       occupation: {
         type: Sequelize.STRING,
         allowNull: true,
-        validate: {
-          notEmpty: true
-        }
+
       },
       language: {
         type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: [],
         allowNull: true,
-        validate: {
-          notEmpty: true
-        }
       },
       bio: {
         type: Sequelize.STRING,
         allowNull: true,
-        validate: {
-          notEmpty: true
-        }
       },
       imageurl: {
         type: Sequelize.STRING

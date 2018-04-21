@@ -274,7 +274,13 @@ module.exports.fetchActivity = (req, res, next) => {
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;
-                Rating.findAndCountAll({ where: { activityId } })
+                Rating.findAndCountAll({
+                    where: {
+                        activityId,
+                        parentId: 0,
+                        replyToId: 0
+                    }
+                })
                     .then(result => {
                         data.numOfRater = result.count;
                         return result.count;
