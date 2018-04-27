@@ -107,7 +107,7 @@ module.exports.updateBasic = (req, res, next) => {
                         });
                     } else if (pair.hasOwnProperty("imageurl")) {
                         user.update(pair).then(updatedUser => {
-                            res.send("");
+                            res.send(updatedUser.dataValues);
                         });
                     } else {
                         user.update(pair).then(updatedUser => {

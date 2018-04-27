@@ -124,7 +124,7 @@ module.exports.fetchUser = (req, res, next) => {
                 res.end();
                 return null;
             } else {
-                // console.log("userbasic", user.dataValues);
+                console.log("userbasic", user.dataValues);
                 res.send(user.dataValues);
             }
         })

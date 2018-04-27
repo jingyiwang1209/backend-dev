@@ -196,8 +196,8 @@ module.exports.updateUserActivity = (req, res, next) => {
                 if (!result) {
                     return res.send("该活动不存在或者你没有修改权限!");
                 } else {
-                    res.send({});
-                    return result.update({ imageurl: edittedValues.imageurl });
+                    result.update({ imageurl: edittedValues.imageurl });
+                    res.send(result.dataValues)
                 }
             })
             .catch(e => next(e));
