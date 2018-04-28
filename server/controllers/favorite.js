@@ -1,4 +1,5 @@
 const Activity = require("../models").Activity;
+const ActivityLikes = require("../models").ActivityLikes;
 const User = require("../models").User;
 const Favorite = require("../models").Favorite;
 const Sequelize = require("sequelize");
@@ -7,6 +8,7 @@ const Op = Sequelize.Op;
 module.exports.deleteUserFavorite = (req, res, next) => {
     const { favId } = req.params;
     const userId = req.user.id;
+    const userMarker = userId + ";";
 
     if (Number.isNaN(parseInt(favId))) {
         res.send("输入地址无效");
@@ -14,28 +16,41 @@ module.exports.deleteUserFavorite = (req, res, next) => {
         return null;
     }
     Favorite.findOne({
-        where:{
-            userId,
+        where: {
+            userId
         }
-    }).then((fav)=>{
+    }).then(fav => {
         // fav [ 20, 18, 19 ]
-       let modifiedFavs;
-        if(fav.favorites.includes(+favId)){
+        let modifiedFavs;
+        if (fav.favorites.includes(+favId)) {
             let index = fav.favorites.indexOf(+favId);
-            modifiedFavs = fav.favorites.slice(0, index).concat(fav.favorites.slice(index + 1));
-            fav.update({
-            favorites:modifiedFavs,
-                }).then((result)=>{
-            // console.log("Result", result.dataValues.favorites);
-             if(result){
-                res.send(favId);
-               }
-             });
-        }else{
+            modifiedFavs = fav.favorites
+                .slice(0, index)
+                .concat(fav.favorites.slice(index + 1));
+            fav
+                .update({
+                    favorites: modifiedFavs
+                })
+                .then(result => {
+                    // console.log("Result", result.dataValues.favorites);
+                    if (result) {
+                        res.send(favId);
+                    }
+                });
+        } else {
             res.send("该收藏不存在");
         }
     });
-
+    ActivityLikes.findOne({
+        where: {
+            activityId: favId
+        }
+    }).then(activityLike => {
+        activityLike.update({
+            numOfLikes: activityLike.numOfLikes - 1,
+            userMarkers: activityLike.userMarkers.replace(userMarker, "")
+        });
+    })
 };
 
 module.exports.fetchUserFavorites = (req, res, next) => {
@@ -56,7 +71,6 @@ module.exports.fetchUserFavorites = (req, res, next) => {
                 });
                 res.end();
             } else {
-
                 Activity.findAll({
                     where: {
                         id: {
@@ -65,14 +79,13 @@ module.exports.fetchUserFavorites = (req, res, next) => {
                     }
                 }).then(favs => {
                     // in case the activity is deleted by its creator
-                    if(favs.length > 0){
-                       favs.forEach((fav)=>{
+                    if (favs.length > 0) {
+                        favs.forEach(fav => {
                             data.push(fav.dataValues);
-
                         });
-                       res.send(data);
-                    }else{
-                        res.send({warning:"活动已经不存在"});
+                        res.send(data);
+                    } else {
+                        res.send({ warning: "活动已经不存在" });
                     }
                 });
             }

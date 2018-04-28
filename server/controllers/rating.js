@@ -190,6 +190,7 @@ module.exports.fetchRatings = (req, res, next) => {
                                     }
                                 }
                             }
+                            // console.log(data)
                             res.send(data);
                         });
                     });
