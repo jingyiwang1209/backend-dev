@@ -16,13 +16,6 @@ module.exports = (sequelize, DataTypes) => {
         isNumeric: true
       }
     },
-    replyToId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        isNumeric: true
-      }
-    },
 
     feedback: {
       type: DataTypes.STRING,
@@ -31,13 +24,15 @@ module.exports = (sequelize, DataTypes) => {
         len: [0, 300]
       }
     },
-    userId: {
+
+    replyToId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         isNumeric: true
       }
     },
+
     activityId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -50,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
   Rating.associate = function(models) {
     Rating.belongsTo(models.User, {
       foreignKey: "creatorId",
+      onDelete: "CASCADE"
+    });
+    Rating.belongsTo(models.User, {
+      foreignKey: "userId",
       onDelete: "CASCADE"
     });
   };

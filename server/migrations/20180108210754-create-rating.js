@@ -24,13 +24,6 @@ module.exports = {
           isNumeric: true
         }
       },
-      replyToId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        validate: {
-          isNumeric: true
-        }
-      },
 
       feedback: {
         type: Sequelize.STRING,
@@ -39,7 +32,8 @@ module.exports = {
           len: [0, 300]
         }
       },
-      userId: {
+
+      replyToId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         validate: {
@@ -70,6 +64,16 @@ module.exports = {
           model: "Users",
           key: "id",
           as: "creatorId"
+        }
+      },
+
+      userId: {
+        type: Sequelize.INTEGER,
+        onDelete: "CASCADE",
+        references: {
+          model: "Users",
+          key: "id",
+          as: "userId"
         }
       }
     });

@@ -114,7 +114,7 @@ module.exports.fetchRatings = (req, res, next) => {
                     }
                 }
             }
-
+            //commentToReply: Rating id: [ 112, 103, 137, 97, 100, 97, 97, 103, 102, 116, 104 ]
             User.findAll({
                 where: {
                     id: {
@@ -135,6 +135,8 @@ module.exports.fetchRatings = (req, res, next) => {
                     }
                 }
 
+                // generate replyTo@ whom
+
                 if (commentToReply.length > 0) {
                     Rating.findAll({
                         where: {
@@ -145,13 +147,26 @@ module.exports.fetchRatings = (req, res, next) => {
                     }).then(parents => {
                         parents.forEach(parent => {
                             let whomId = parent.dataValues.userId;
-                            whomToReply.push(whomId);
+                            if (whomToReply.indexOf(whomId) === -1) {
+                                whomToReply.push(whomId);
+                            }
+                            // whomToReply:[ 43, 46, 44, 45, 35 ]
+
                             let commentId = parent.id;
                             record.push({
                                 [commentId]: whomId
                             });
                         });
-                        // [ { '97': 43 }, { '100': 46 } ]
+
+                        // rating id: userId(who creates a comment)
+                        // [ { '97': 43 },
+                        // { '100': 46 },
+                        // { '102': 44 },
+                        // { '103': 45 },
+                        // { '104': 45 },
+                        // { '112': 35 },
+                        // { '116': 35 },
+                        // { '137': 43 } ]
 
                         User.findAll({
                             where: {
@@ -160,38 +175,31 @@ module.exports.fetchRatings = (req, res, next) => {
                                 }
                             }
                         }).then(users => {
-                            let arr = [];
                             if (users) {
+                                for (let i = 0; i < users.length; i++) {
+                                    let userId = users[i].dataValues.id;
+                                    let username = users[i].dataValues.username;
+                                    for (let j = 0; j < record.length; j++) {
+                                        let value = Object.values(record[j])[0];
+                                        if (userId === value) {
+                                            let key = Object.keys(record[j])[0];
+                                            record[j][key] = username;
+                                        }
+                                    }
+                                }
                                 for (let i = 0; i < record.length; i++) {
-                                    let key = Object.keys(record[i])[0];
-                                    let value = Object.values(record[i])[0];
-
-                                    for (let j = 0; j < users.length; j++) {
-                                        if (users[j].dataValues.id === value) {
-                                            users[j].dataValues.commentId = key;
-                                            arr.push(users[j].dataValues);
+                                    let commentId = Object.keys(record[i])[0];
+                                    let username = Object.values(record[i])[0];
+                                    for (let j = 0; j < data.length; j++) {
+                                        if (data[j].replyToId === +commentId) {
+                                            data[j].whomToReply = username;
                                         }
                                     }
                                 }
 
-                                for (let i = 0; i < data.length; i++) {
-                                    let item = data[i];
-                                    if (item.parentId !== item.replyToId) {
-                                        for (let j = 0; j < arr.length; j++) {
-                                            let user = arr[j];
-                                            if (
-                                                item.replyToId ===
-                                                +user.commentId
-                                            ) {
-                                                data[i].whomToReply =
-                                                    user.username;
-                                            }
-                                        }
-                                    }
-                                }
+                                // console.log(data)
+                                res.send(data);
                             }
-                            // console.log(data)
-                            res.send(data);
                         });
                     });
                 } else {
@@ -213,11 +221,13 @@ module.exports.fetchRatingSummary = (req, res, next) => {
         return null;
     }
     const statement = {};
-    Rating.count({ where: {
-        activityId,
-        parentId:0,
-        replyToId:0
-        } })
+    Rating.count({
+        where: {
+            activityId,
+            parentId: 0,
+            replyToId: 0
+        }
+    })
         .then(denominator => {
             statement["numOfRater"] = denominator;
             return denominator;
