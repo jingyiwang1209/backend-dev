@@ -1,6 +1,5 @@
 const passportService = require("../middleware/passport");
 const passport = require("passport");
-
 const signupController = require("../controllers/authenticate").signup;
 const completeUserProfile = require("../controllers/authenticate").completeUserProfile;
 const verifySignupEmail = require("../controllers/authenticate").verifySignupEmail;
@@ -73,7 +72,7 @@ module.exports = app => {
     app.post("/api/addWish", requireAuth, addWish);
     app.get("/api/fetchWish", requireAuth, fetchWish);
     app.post("/api/addActivity", requireAuth, addActivity);
-    app.get("/api/fetchActivity", requireAuth, fetchActivity);
+    app.get("/api/fetchActivity/:lastId", requireAuth, fetchActivity);
     app.post("/api/clickLikes/:activityId", requireAuth, clickLikes);
     app.get("/api/activity/:activityId", requireAuth, fetchOneActivity);
     app.get("/api/wish/:wishId", requireAuth, fetchOneWish);

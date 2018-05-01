@@ -21,7 +21,6 @@ module.exports.addRating = (req, res, next) => {
             userId,
             activityId,
             creatorId,
-            numOfStars
         };
         defaultObj = {
             userId,
@@ -35,7 +34,6 @@ module.exports.addRating = (req, res, next) => {
     } else {
         queryObj = {
             userId,
-            feedback,
             activityId,
             creatorId,
             parentId: parentId,
@@ -196,8 +194,6 @@ module.exports.fetchRatings = (req, res, next) => {
                                         }
                                     }
                                 }
-
-                                // console.log(data)
                                 res.send(data);
                             }
                         });

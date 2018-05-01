@@ -1,9 +1,7 @@
 const Wish = require("../models").Wish;
 const User = require("../models").User;
 const WishLikes = require("../models").WishLikes;
-const moment = require("moment");
-require("moment/locale/zh-cn.js");
-moment.locale('zh-cn');
+
 
 module.exports.fetchUserWishes = (req, res, next) => {
     if (Number.isNaN(parseInt(req.params.userId))) {
@@ -70,11 +68,6 @@ module.exports.fetchWishForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the wish
                 if (result.dataValues.userId === req.user.id) {
-                    let departdate = moment(result.dataValues.departdate).format('lll');
-                    let finishdate = moment(result.dataValues.finishdate).format('lll');
-                    result.dataValues.departdate = departdate;
-                    result.dataValues.finishdate = finishdate;
-
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此愿望" });
@@ -204,10 +197,6 @@ module.exports.fetchWish = (req, res, next) => {
         .then(wishes => {
             const length = wishes.length;
             for (var i = 0; i < wishes.length; i++) {
-                let departdate = moment(wishes[i].dataValues.departdate).format('lll');
-                let finishdate = moment(wishes[i].dataValues.finishdate).format('lll');
-                wishes[i].dataValues.departdate = departdate;
-                wishes[i].dataValues.finishdate = finishdate;
                 let wish = wishes[i].dataValues;
                 // console.log("wish", wish);
                 let wishId = wish.id;
@@ -251,10 +240,6 @@ module.exports.fetchOneWish = (req, res, next) => {
     })
         .then(wish => {
             if (wish) {
-                let departdate = moment(wish.dataValues.departdate).format('lll');
-                let finishdate = moment(wish.dataValues.finishdate).format('lll');
-                wish.dataValues.departdate = departdate;
-                wish.dataValues.finishdate = finishdate;
                 data = wish.dataValues;
                 return data;
             } else {

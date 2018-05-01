@@ -4,10 +4,8 @@ const ActivityLikes = require("../models").ActivityLikes;
 const Rating = require("../models").Rating;
 const Favorite = require("../models").Favorite;
 const passport = require("passport");
-const requireAuth = passport.authenticate("jwt", { session: false });
-const moment = require("moment");
-require("moment/locale/zh-cn.js");
-moment.locale("zh-cn");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
@@ -154,14 +152,6 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
                 if (result.dataValues.userId === req.user.id) {
-                    let departdate = moment(
-                        result.dataValues.departdate
-                    ).format("lll");
-                    let finishdate = moment(
-                        result.dataValues.finishdate
-                    ).format("lll");
-                    result.dataValues.departdate = departdate;
-                    result.dataValues.finishdate = finishdate;
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此活动" });
@@ -197,7 +187,7 @@ module.exports.updateUserActivity = (req, res, next) => {
                     return res.send("该活动不存在或者你没有修改权限!");
                 } else {
                     result.update({ imageurl: edittedValues.imageurl });
-                    res.send(result.dataValues)
+                    res.send(result.dataValues);
                 }
             })
             .catch(e => next(e));
@@ -253,24 +243,35 @@ module.exports.deleteUserActivity = (req, res, next) => {
         });
 };
 // Do with DEnormalization here???????????????
+
 module.exports.fetchActivity = (req, res, next) => {
+    let { lastId } = req.params;
     let response = [];
+    let idObject;
+    if (lastId > 0) {
+        idObject = {
+            [Op.lt]: +lastId
+        }
+    } else {
+        idObject = {
+            [Op.ne]: 0
+        }
+    }
+
     Activity.findAll({
         where: {
-            deleteIt: false
-        }
+            deleteIt: false,
+            id: idObject
+        },
+        limit: 4,
+        order: [["id", "DESC"]]
     })
         .then(activities => {
+            if(activities.length === 0){
+                return res.send([])
+            }
             let length = activities.length;
             for (let i = 0; i < length; i++) {
-                let departdate = moment(
-                    activities[i].dataValues.departdate
-                ).format("lll");
-                let finishdate = moment(
-                    activities[i].dataValues.finishdate
-                ).format("lll");
-                activities[i].dataValues.departdate = departdate;
-                activities[i].dataValues.finishdate = finishdate;
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;
@@ -314,6 +315,9 @@ module.exports.fetchActivity = (req, res, next) => {
                                         data.username = user.username;
                                         response.push(data);
                                         if (response.length == length) {
+                                            response.sort(
+                                                (a, b) => b.id - a.id
+                                            );
                                             res.send(response);
                                         }
                                     })
@@ -340,14 +344,6 @@ module.exports.fetchOneActivity = (req, res, next) => {
     Activity.findById(activityId)
         .then(activity => {
             if (activity && activity.deleteIt === false) {
-                let departdate = moment(activity.dataValues.departdate).format(
-                    "lll"
-                );
-                let finishdate = moment(activity.dataValues.finishdate).format(
-                    "lll"
-                );
-                activity.dataValues.departdate = departdate;
-                activity.dataValues.finishdate = finishdate;
                 data = activity.dataValues;
                 return data;
             } else {

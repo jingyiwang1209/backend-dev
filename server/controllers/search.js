@@ -33,7 +33,9 @@ module.exports.fetchSearchData = (req, res, next) => {
 
                     Rating.findAndCountAll({
                         where: {
-                            activityId: activityObj.id
+                            activityId: activityObj.id,
+                            parentId: 0,
+                            replyToId: 0
                         }
                     }).then(result => {
                         if (result.count === 0) {
