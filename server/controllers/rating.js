@@ -4,6 +4,27 @@ const Activity = require("../models").Activity;
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+
+// 2018/05/03 12:09
+function getFormattedDate(gmtDate) {
+    let date = new Date(gmtDate);
+    let year = date.getFullYear();
+
+    let month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    let day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    let hour = date.getHours().toString();
+    hour = hour.length > 1 ? hour : "0" + hour;
+
+    let miniute = date.getMinutes().toString();
+    miniute = miniute.length > 1 ? miniute : "0" + miniute;
+    return year + "/" + month + "/" + day + " " + hour + ":" + miniute;
+}
+
+
 module.exports.addRating = (req, res, next) => {
     const userId = req.user.id;
     let queryObj = null;
@@ -92,6 +113,7 @@ module.exports.fetchRatings = (req, res, next) => {
         res.end();
         return null;
     }
+
     let data = [];
     let users = [];
     let commentToReply = [];
@@ -102,6 +124,7 @@ module.exports.fetchRatings = (req, res, next) => {
     }).then(result => {
         if (result.length > 0) {
             for (var i = 0; i < result.length; i++) {
+                result[i].dataValues.createdAt = getFormattedDate(result[i].dataValues.createdAt)
                 let item = result[i];
                 data.push(item.dataValues);
                 users.push(item.dataValues.userId);

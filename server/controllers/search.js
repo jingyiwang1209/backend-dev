@@ -6,6 +6,25 @@ const Rating = require("../models").Rating;
 const qs = require("qs");
 const Op = Sequelize.Op;
 
+// 2018/05/03 12:09
+function getFormattedDate(gmtDate) {
+    let date = new Date(gmtDate);
+    let year = date.getFullYear();
+
+    let month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    let day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    let hour = date.getHours().toString();
+    hour = hour.length > 1 ? hour : "0" + hour;
+
+    let miniute = date.getMinutes().toString();
+    miniute = miniute.length > 1 ? miniute : "0" + miniute;
+    return year + "/" + month + "/" + day + " " + hour + ":" + miniute;
+}
+
 module.exports.fetchSearchData = (req, res, next) => {
     // { location: '石家庄市 河北省', services: [ '徒步旅行' ] }
     let location = qs.parse(req.query).location;
@@ -18,7 +37,7 @@ module.exports.fetchSearchData = (req, res, next) => {
         Activity.findAndCountAll({
             where: {
                 location: location,
-                deleteIt:false
+                deleteIt: false
             }
         }).then(result => {
             let length = result.count;
@@ -27,6 +46,9 @@ module.exports.fetchSearchData = (req, res, next) => {
                 return null;
             } else {
                 result.rows.forEach(row => {
+                    let { departdate, finishdate } = row.dataValues;
+                    row.dataValues.departdate = getFormattedDate(departdate);
+                    row.dataValues.finishdate = getFormattedDate(finishdate);
                     let activityObj = row.dataValues;
                     activityObj["counter"] = result.count;
                     activityObj["category"] = "活动";
@@ -66,7 +88,7 @@ module.exports.fetchSearchData = (req, res, next) => {
         Wish.findAndCountAll({
             where: {
                 location: location,
-                deleteIt:false
+                deleteIt: false
             }
         })
             .then(result => {
@@ -75,6 +97,13 @@ module.exports.fetchSearchData = (req, res, next) => {
                     return null;
                 } else {
                     result.rows.forEach(row => {
+                        let { departdate, finishdate } = row.dataValues;
+                        row.dataValues.departdate = getFormattedDate(
+                            departdate
+                        );
+                        row.dataValues.finishdate = getFormattedDate(
+                            finishdate
+                        );
                         row.dataValues["counter"] = result.count;
                         row.dataValues["category"] = "愿望";
                         data.push(row.dataValues);
@@ -119,7 +148,7 @@ module.exports.fetchSearchData = (req, res, next) => {
                             let guide = {};
                             guide["counter"] = result.count;
                             guide["category"] = "向导";
-                            guide["age"] = row.dataValues.age
+                            guide["age"] = row.dataValues.age;
                             guide["id"] = row.dataValues.id;
                             guide["username"] = row.dataValues.username;
                             guide["sex"] = row.dataValues.sex;
@@ -156,4 +185,3 @@ module.exports.fetchSearchData = (req, res, next) => {
         });
     }
 };
-

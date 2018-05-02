@@ -7,6 +7,25 @@ const passport = require("passport");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+// 2018/05/03 12:09
+function getFormattedDate(gmtDate) {
+    let date = new Date(gmtDate);
+    let year = date.getFullYear();
+
+    let month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    let day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    let hour = date.getHours().toString();
+    hour = hour.length > 1 ? hour : "0" + hour;
+
+    let miniute = date.getMinutes().toString();
+    miniute = miniute.length > 1 ? miniute : "0" + miniute;
+    return year + "/" + month + "/" + day + " " + hour + ":" + miniute;
+}
+
 module.exports.verifyYourFev = (req, res, next) => {
     const userId = req.user.id;
     const { activityId } = req.params;
@@ -49,12 +68,12 @@ module.exports.addActivity = (req, res, next) => {
 
     const userId = req.user.id;
     // console.log("userId", userId);
+    let departUTC = new Date(departdate).toUTCString();
+    let finishUTC = new Date(finishdate).toUTCString();
     Activity.findOrCreate({
         where: {
             theme,
             location,
-            departdate,
-            finishdate,
             budget,
             minNumOfPeople,
             maxNumOfPeople,
@@ -66,8 +85,8 @@ module.exports.addActivity = (req, res, next) => {
         defaults: {
             theme,
             location,
-            departdate,
-            finishdate,
+            departdate: departUTC,
+            finishdate: finishUTC,
             budget,
             minNumOfPeople,
             maxNumOfPeople,
@@ -152,6 +171,9 @@ module.exports.fetchActivityForEditting = (req, res, next) => {
             if (result) {
                 // make sure the current logged user is the one who created the activity
                 if (result.dataValues.userId === req.user.id) {
+                    let { departdate, finishdate } = result.dataValues;
+                    result.dataValues.departdate = getFormattedDate(departdate);
+                    result.dataValues.finishdate = getFormattedDate(finishdate);
                     res.send(result.dataValues);
                 } else {
                     res.send({ warning: "你没有权限修改此活动" });
@@ -192,6 +214,14 @@ module.exports.updateUserActivity = (req, res, next) => {
             })
             .catch(e => next(e));
     } else {
+        let { departdate, finishdate } = edittedValues;
+        if (departdate) {
+            edittedValues.departdate = new Date(departdate).toUTCString();
+        }
+        if (finishdate) {
+            edittedValues.finishdate = new Date(finishdate).toUTCString();
+        }
+
         Activity.update(edittedValues, {
             where: {
                 id: activityId,
@@ -251,11 +281,11 @@ module.exports.fetchActivity = (req, res, next) => {
     if (lastId > 0) {
         idObject = {
             [Op.lt]: +lastId
-        }
+        };
     } else {
         idObject = {
             [Op.ne]: 0
-        }
+        };
     }
 
     Activity.findAll({
@@ -267,11 +297,18 @@ module.exports.fetchActivity = (req, res, next) => {
         order: [["id", "DESC"]]
     })
         .then(activities => {
-            if(activities.length === 0){
-                return res.send([])
+            if (activities.length === 0) {
+                return res.send([]);
             }
             let length = activities.length;
             for (let i = 0; i < length; i++) {
+                let { departdate, finishdate } = activities[i].dataValues;
+                activities[i].dataValues.departdate = getFormattedDate(
+                    departdate
+                );
+                activities[i].dataValues.finishdate = getFormattedDate(
+                    finishdate
+                );
                 const data = activities[i].dataValues;
                 const activityId = data.id;
                 const userId = data.userId;
@@ -344,6 +381,9 @@ module.exports.fetchOneActivity = (req, res, next) => {
     Activity.findById(activityId)
         .then(activity => {
             if (activity && activity.deleteIt === false) {
+                let { departdate, finishdate } = activity.dataValues;
+                activity.dataValues.departdate = getFormattedDate(departdate);
+                activity.dataValues.finishdate = getFormattedDate(finishdate);
                 data = activity.dataValues;
                 return data;
             } else {

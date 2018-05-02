@@ -4,6 +4,28 @@ const Rating = require("../models").Rating;
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+
+// 2018/05/03 12:09
+function getFormattedDate(gmtDate) {
+    let date = new Date(gmtDate);
+    let year = date.getFullYear();
+
+    let month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    let day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    let hour = date.getHours().toString();
+    hour = hour.length > 1 ? hour : "0" + hour;
+
+    let miniute = date.getMinutes().toString();
+    miniute = miniute.length > 1 ? miniute : "0" + miniute;
+    return year + "/" + month + "/" + day + " " + hour + ":" + miniute;
+}
+
+
+
 module.exports.fetchComments = (req, res, next) => {
     let creatorId;
     // 0 means the person itself is reviewing his/ her story
@@ -36,6 +58,7 @@ module.exports.fetchComments = (req, res, next) => {
             let data = [];
             let total = 0;
             result.rows.forEach(item => {
+                item.dataValues.createdAt = getFormattedDate(item.dataValues.createdAt)
                 users.push(item.dataValues.userId);
                 activities.push(item.dataValues.activityId);
                 total += item.numOfStars;

@@ -2,6 +2,24 @@ const Wish = require("../models").Wish;
 const User = require("../models").User;
 const WishLikes = require("../models").WishLikes;
 
+// 2018/05/03 12:09
+function getFormattedDate(gmtDate) {
+    let date = new Date(gmtDate);
+    let year = date.getFullYear();
+
+    let month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    let day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    let hour = date.getHours().toString();
+    hour = hour.length > 1 ? hour : "0" + hour;
+
+    let miniute = date.getMinutes().toString();
+    miniute = miniute.length > 1 ? miniute : "0" + miniute;
+    return year + "/" + month + "/" + day + " " + hour + ":" + miniute;
+}
 
 module.exports.fetchUserWishes = (req, res, next) => {
     if (Number.isNaN(parseInt(req.params.userId))) {
@@ -91,6 +109,14 @@ module.exports.updateUserWish = (req, res, next) => {
         return null;
     }
 
+    let { departdate, finishdate } = edittedValues;
+    if (departdate) {
+        edittedValues.departdate = new Date(departdate).toUTCString();
+    }
+    if (finishdate) {
+        edittedValues.finishdate = new Date(finishdate).toUTCString();
+    }
+
     Wish.update(edittedValues, {
         where: {
             id: wishId,
@@ -154,11 +180,11 @@ module.exports.addWish = (req, res, next) => {
     } = req.body;
     const userId = req.user.id;
     // console.log("userId", userId);
+    let departUTC = new Date(departdate).toUTCString();
+    let finishUTC = new Date(finishdate).toUTCString();
     Wish.findOrCreate({
         where: {
             location,
-            departdate,
-            finishdate,
             budget,
             numberOfPeople,
             services,
@@ -167,8 +193,8 @@ module.exports.addWish = (req, res, next) => {
         },
         defaults: {
             location,
-            departdate,
-            finishdate,
+            departdate: departUTC,
+            finishdate: finishUTC,
             budget,
             numberOfPeople,
             services,
@@ -197,7 +223,11 @@ module.exports.fetchWish = (req, res, next) => {
         .then(wishes => {
             const length = wishes.length;
             for (var i = 0; i < wishes.length; i++) {
+                let { departdate, finishdate } = wishes[i].dataValues;
+                wishes[i].dataValues.departdate = getFormattedDate(departdate);
+                wishes[i].dataValues.finishdate = getFormattedDate(finishdate);
                 let wish = wishes[i].dataValues;
+
                 // console.log("wish", wish);
                 let wishId = wish.id;
                 WishLikes.findOrCreate({
@@ -240,6 +270,9 @@ module.exports.fetchOneWish = (req, res, next) => {
     })
         .then(wish => {
             if (wish) {
+                let { departdate, finishdate } = wish.dataValues;
+                wish.dataValues.departdate = getFormattedDate(departdate);
+                wish.dataValues.finishdate = getFormattedDate(finishdate);
                 data = wish.dataValues;
                 return data;
             } else {
@@ -256,12 +289,11 @@ module.exports.fetchOneWish = (req, res, next) => {
             User.findById(data.userId)
                 .then(user => {
                     data.username = user.username;
-                    data.userimageurl = user.imageurl
+                    data.userimageurl = user.imageurl;
                     data.mail = user.mail;
                     if (user.id === userId) {
                         data.isYourWish = true;
                     }
-
                 })
                 .then(() => {
                     console.log("wish", data);
@@ -270,7 +302,6 @@ module.exports.fetchOneWish = (req, res, next) => {
         })
         .catch(e => next(e));
 };
-
 
 module.exports.wishLikes = (req, res, next) => {
     const { wishId } = req.params;
