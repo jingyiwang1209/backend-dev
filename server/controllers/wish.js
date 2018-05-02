@@ -110,11 +110,19 @@ module.exports.updateUserWish = (req, res, next) => {
     }
 
     let { departdate, finishdate } = edittedValues;
-    if (departdate) {
+
+    if(departdate){
+        if(departdate.includes("年")){
+            departdate = departdate.replace(/年|月|日/g, "/");
+        }
         edittedValues.departdate = new Date(departdate).toUTCString();
     }
-    if (finishdate) {
-        edittedValues.finishdate = new Date(finishdate).toUTCString();
+
+    if(finishdate){
+        if(finishdate.includes("年")){
+            finishdate = finishdate.replace(/年|月|日/g, "/");
+        }
+         edittedValues.finishdate = new Date(finishdate).toUTCString();
     }
 
     Wish.update(edittedValues, {
@@ -169,7 +177,7 @@ module.exports.deleteUserWish = (req, res, next) => {
 };
 
 module.exports.addWish = (req, res, next) => {
-    const {
+    let {
         location,
         departdate,
         finishdate,
@@ -180,8 +188,15 @@ module.exports.addWish = (req, res, next) => {
     } = req.body;
     const userId = req.user.id;
     // console.log("userId", userId);
+
+    if (departdate.includes("年") || finishdate.includes("年")) {
+        departdate = departdate.replace(/年|月|日/g, "/");
+        finishdate = finishdate.replace(/年|月|日/g, "/");
+    }
     let departUTC = new Date(departdate).toUTCString();
     let finishUTC = new Date(finishdate).toUTCString();
+
+
     Wish.findOrCreate({
         where: {
             location,

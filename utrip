@@ -1,0 +1,719 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.1
+-- Dumped by pg_dump version 10.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: Activities; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "Activities" (
+    id integer NOT NULL,
+    theme character varying(255),
+    location character varying(255),
+    departdate character varying(255),
+    finishdate character varying(255),
+    budget character varying(255),
+    services text[],
+    story character varying(255),
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "userId" integer,
+    imageurl character varying,
+    "deleteIt" boolean,
+    "minNumOfPeople" integer,
+    "maxNumOfPeople" integer
+);
+
+
+ALTER TABLE "Activities" OWNER TO username;
+
+--
+-- Name: Activities_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "Activities_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "Activities_id_seq" OWNER TO username;
+
+--
+-- Name: Activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "Activities_id_seq" OWNED BY "Activities".id;
+
+
+--
+-- Name: ActivityLikes; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "ActivityLikes" (
+    id integer NOT NULL,
+    "numOfLikes" integer,
+    "userMarkers" character varying(255),
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "activityId" integer
+);
+
+
+ALTER TABLE "ActivityLikes" OWNER TO username;
+
+--
+-- Name: ActivityLikes_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "ActivityLikes_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "ActivityLikes_id_seq" OWNER TO username;
+
+--
+-- Name: ActivityLikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "ActivityLikes_id_seq" OWNED BY "ActivityLikes".id;
+
+
+--
+-- Name: Favorites; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "Favorites" (
+    id integer NOT NULL,
+    favorites integer[],
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "userId" integer
+);
+
+
+ALTER TABLE "Favorites" OWNER TO username;
+
+--
+-- Name: Favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "Favorites_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "Favorites_id_seq" OWNER TO username;
+
+--
+-- Name: Favorites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "Favorites_id_seq" OWNED BY "Favorites".id;
+
+
+--
+-- Name: Ratings; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "Ratings" (
+    id integer NOT NULL,
+    feedback character varying(255),
+    "numOfStars" integer,
+    "userId" integer,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "creatorId" integer,
+    "activityId" integer,
+    "parentId" integer,
+    "replyToId" integer
+);
+
+
+ALTER TABLE "Ratings" OWNER TO username;
+
+--
+-- Name: Ratings_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "Ratings_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "Ratings_id_seq" OWNER TO username;
+
+--
+-- Name: Ratings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "Ratings_id_seq" OWNED BY "Ratings".id;
+
+
+--
+-- Name: SequelizeMeta; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "SequelizeMeta" (
+    name character varying(255) NOT NULL
+);
+
+
+ALTER TABLE "SequelizeMeta" OWNER TO username;
+
+--
+-- Name: Users; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "Users" (
+    id integer NOT NULL,
+    mail character varying(255),
+    password character varying(255),
+    username character varying(255),
+    sex character varying(255),
+    age character varying,
+    city character varying(255),
+    "yearOfLiving" character varying,
+    school character varying(255),
+    occupation character varying(255),
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    imageurl character varying,
+    language text[],
+    bio text
+);
+
+
+ALTER TABLE "Users" OWNER TO username;
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "Users_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "Users_id_seq" OWNER TO username;
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "Users_id_seq" OWNED BY "Users".id;
+
+
+--
+-- Name: WishLikes; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "WishLikes" (
+    id integer NOT NULL,
+    "numOfLikes" integer,
+    "userMarkers" character varying(255),
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "wishId" integer
+);
+
+
+ALTER TABLE "WishLikes" OWNER TO username;
+
+--
+-- Name: WishLikes_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "WishLikes_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "WishLikes_id_seq" OWNER TO username;
+
+--
+-- Name: WishLikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "WishLikes_id_seq" OWNED BY "WishLikes".id;
+
+
+--
+-- Name: Wishes; Type: TABLE; Schema: public; Owner: username
+--
+
+CREATE TABLE "Wishes" (
+    id integer NOT NULL,
+    location character varying(255),
+    departdate character varying(255),
+    finishdate character varying(255),
+    budget numeric(10,0),
+    services text[],
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "userId" integer,
+    note character varying,
+    "numberOfPeople" integer,
+    "deleteIt" boolean
+);
+
+
+ALTER TABLE "Wishes" OWNER TO username;
+
+--
+-- Name: Wishes_id_seq; Type: SEQUENCE; Schema: public; Owner: username
+--
+
+CREATE SEQUENCE "Wishes_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "Wishes_id_seq" OWNER TO username;
+
+--
+-- Name: Wishes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
+--
+
+ALTER SEQUENCE "Wishes_id_seq" OWNED BY "Wishes".id;
+
+
+--
+-- Name: Activities id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Activities" ALTER COLUMN id SET DEFAULT nextval('"Activities_id_seq"'::regclass);
+
+
+--
+-- Name: ActivityLikes id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "ActivityLikes" ALTER COLUMN id SET DEFAULT nextval('"ActivityLikes_id_seq"'::regclass);
+
+
+--
+-- Name: Favorites id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Favorites" ALTER COLUMN id SET DEFAULT nextval('"Favorites_id_seq"'::regclass);
+
+
+--
+-- Name: Ratings id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Ratings" ALTER COLUMN id SET DEFAULT nextval('"Ratings_id_seq"'::regclass);
+
+
+--
+-- Name: Users id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Users" ALTER COLUMN id SET DEFAULT nextval('"Users_id_seq"'::regclass);
+
+
+--
+-- Name: WishLikes id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "WishLikes" ALTER COLUMN id SET DEFAULT nextval('"WishLikes_id_seq"'::regclass);
+
+
+--
+-- Name: Wishes id; Type: DEFAULT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Wishes" ALTER COLUMN id SET DEFAULT nextval('"Wishes_id_seq"'::regclass);
+
+
+--
+-- Data for Name: Activities; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "Activities" (id, theme, location, departdate, finishdate, budget, services, story, "createdAt", "updatedAt", "userId", imageurl, "deleteIt", "minNumOfPeople", "maxNumOfPeople") FROM stdin;
+64	ss	邯郸市 河北省	29 Mar 2018 2:00	30 Mar 2018 2:00	12	{徒步旅行}	w	2018-03-28 14:01:29.011-07	2018-03-28 14:01:31.274-07	35	\N	t	\N	\N
+18	青岛海边小城3日游	青岛市 山东省	11 Apr 2018 2:55	19 Apr 2018 2:55	4200	{徒步旅行}	我在青岛生活了2年。我爱这里清新的海风，美味的海鲜，淳朴热情的本地居民。青岛犹如中国东海岸一颗耀眼的明珠，熠熠生辉。我来带你吃地道的青岛海鲜，呼吸最清爽的海风。	2018-03-12 14:56:27.342-07	2018-03-12 14:56:27.342-07	31	\N	f	1	2
+53	冰峪沟1日游	庄河市 辽宁省	Sun, 01 Apr 2018 22:19:00 GMT	Tue, 03 Apr 2018 21:00:00 GMT	550	{徒步旅行}	冰峪沟俗称东北小桂林，景色秀美，浑然天成。	2018-03-26 20:34:36.542-07	2018-04-29 18:36:20.221-07	35	35/activity-target/e1a860a0-4c16-11e8-be24-811e4ac74a7a.jpeg	f	1	1
+54	12	石家庄市 河北省	29 Mar 2018 12:33	30 Mar 2018 12:33	12	{徒步旅行}	s	2018-03-28 12:33:33.354-07	2018-03-28 12:41:55.095-07	35	\N	t	\N	\N
+19	珠海夜景2日游	珠海市 广东省	19 Apr 2018 2:55	21 Apr 2018 2:55	2800	{徒步旅行,汽车接送}	我土生土长在珠海。珠海是一个美丽的城市。白天的珠海，车水马龙，熙熙攘攘，夜间的珠海五光十色，耀眼夺目。我将带你到珠海的最高塔上，眺望整个珠海的夜景，体验什么叫炫目和闪耀。	2018-03-12 15:02:23.74-07	2018-03-12 15:02:52.743-07	32	\N	f	2	4
+20	敦煌一周游	敦煌市 甘肃省	20 Apr 2018 2:55	2018-04-28T09:55:00.000Z	5800	{徒步旅行,汽车接送}	敦煌是一个充满神秘历史的城市。我在这里长大。虽然已经离家多年，可是每年回去都有新的发现。敦煌就像一颗在沙漠中一尘不染的珍珠，吸引着世界各地的来客。我将带你领略常人所不知的敦煌的神秘。	2018-03-12 15:06:24.743-07	2018-03-12 15:06:24.743-07	33	\N	f	1	4
+47	大连槐花节2日游	大连市 辽宁省	Fri, 04 May 2018 01:28:00 GMT	Sat, 05 May 2018 01:28:00 GMT	4500	{徒步旅行}	槐花是大连的象征市花。芳香春节。槐花可以观赏也可以食用。	2018-03-23 22:42:58.898-07	2018-05-02 13:33:19.369-07	35	35/activity-target/b5473e90-4c2b-11e8-be24-811e4ac74a7a.jpeg	f	6	9
+79	台北夜市小吃逛吧	台北市 台湾	Wed, 16 May 2018 19:04:00 GMT	Fri, 18 May 2018 19:04:00 GMT	4300	{徒步旅行,汽车接送}	台北炸鱿鱼寿司卷儿哈日风小吃，串吧high起来	2018-05-02 12:04:26.639-07	2018-05-02 13:36:30.895-07	35	35/activity-target/7e75a090-4e48-11e8-b543-a573c90d0a0b.jpeg	f	2	6
+\.
+
+
+--
+-- Data for Name: ActivityLikes; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "ActivityLikes" (id, "numOfLikes", "userMarkers", "createdAt", "updatedAt", "activityId") FROM stdin;
+57	1	35;43;	2018-03-23 22:43:11.603-07	2018-04-29 21:40:10.872-07	47
+71	0		2018-05-02 12:04:34.305-07	2018-05-02 12:04:34.305-07	79
+60	2	35;	2018-03-26 20:35:23.904-07	2018-04-27 22:34:18.191-07	53
+34	0		2018-03-12 15:06:24.819-07	2018-04-27 22:51:01.36-07	20
+61	0		2018-03-28 12:45:18.805-07	2018-03-28 12:45:18.805-07	54
+32	1	43;	2018-03-12 14:56:27.413-07	2018-04-29 18:33:40.382-07	18
+33	2	33;36;35;	2018-03-12 15:02:23.815-07	2018-04-29 18:33:54.923-07	19
+\.
+
+
+--
+-- Data for Name: Favorites; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "Favorites" (id, favorites, "createdAt", "updatedAt", "userId") FROM stdin;
+12	{}	2018-04-20 18:27:24.757-07	2018-04-20 18:28:29.025-07	44
+10	{19,21}	2018-03-12 22:50:06.105-07	2018-03-14 16:34:10.291-07	36
+7	{17}	2018-03-12 14:56:53.5-07	2018-03-12 14:56:53.513-07	31
+8	{19,17}	2018-03-12 15:06:43.295-07	2018-03-12 15:06:47.096-07	33
+9	{23,21,18}	2018-03-12 16:29:26.391-07	2018-04-29 18:33:54.924-07	35
+15	{}	2018-04-29 21:03:42.981-07	2018-04-29 21:03:52.273-07	57
+11	{47}	2018-04-19 11:18:11.951-07	2018-04-29 21:40:10.873-07	43
+13	{19}	2018-04-20 18:27:24.76-07	2018-04-20 18:27:52.508-07	44
+\.
+
+
+--
+-- Data for Name: Ratings; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "Ratings" (id, feedback, "numOfStars", "userId", "createdAt", "updatedAt", "creatorId", "activityId", "parentId", "replyToId") FROM stdin;
+60	还可以吧。	3	36	2018-03-18 02:18:49.288-07	2018-03-18 02:18:49.288-07	32	19	0	0
+61	非常棒！！	5	35	2018-03-18 02:20:19.214-07	2018-03-18 02:20:19.214-07	31	18	0	0
+62	挺不错的。夜景非常美！	4	35	2018-03-18 02:21:02.631-07	2018-03-18 02:21:02.631-07	32	19	0	0
+63	太差了！！环境差，气候冷。	1	36	2018-03-19 04:20:30.92-07	2018-03-19 04:20:30.92-07	35	31	0	0
+58	哥斯拉亲切和蔼，非常专业！	4	36	2018-03-18 02:17:42.57-07	2018-03-18 02:17:42.57-07	31	18	0	0
+59	在敦煌玩的最开心的一次！！！	5	36	2018-03-18 02:18:33.175-07	2018-03-18 02:18:33.175-07	33	20	0	0
+156	我爱迷妹！	\N	43	2018-04-29 13:18:23.868-07	2018-04-29 13:18:23.868-07	32	19	62	155
+162	😆😆	\N	43	2018-04-29 14:57:47.415-07	2018-04-29 14:57:47.415-07	31	18	61	115
+163	谢谢！😘	\N	35	2018-04-29 18:35:49.062-07	2018-04-29 18:35:49.062-07	35	53	99	99
+129	期待！！！	\N	43	2018-04-27 13:31:44.246-07	2018-04-27 13:31:44.246-07	32	19	62	62
+166	👌	\N	43	2018-04-29 21:41:27.791-07	2018-04-29 21:41:27.791-07	32	19	60	101
+171	ds	\N	35	2018-04-29 22:21:15.334-07	2018-04-29 22:21:15.334-07	58	74	169	170
+97	什么叫还可以？？	\N	43	2018-04-20 18:10:14.291-07	2018-04-20 18:10:14.291-07	32	19	60	60
+98	怎么个棒法？	\N	46	2018-04-20 18:22:16.349-07	2018-04-20 18:22:16.349-07	31	18	61	61
+99	很不错！！！！	5	46	2018-04-20 18:23:38.724-07	2018-04-20 18:23:38.724-07	35	53	0	0
+100	应该就是字面意思，一般般。。	\N	46	2018-04-20 18:24:51.813-07	2018-04-20 18:24:51.813-07	32	19	60	97
+101	也可能有其他意思。。。	\N	44	2018-04-20 18:28:52.672-07	2018-04-20 18:28:52.672-07	32	19	60	100
+102	我理解的没错吧。。。	\N	44	2018-04-20 19:50:59.469-07	2018-04-20 19:50:59.469-07	32	19	60	97
+110	谢谢支持！	\N	35	2018-04-24 13:59:14.65-07	2018-04-24 13:59:14.65-07	35	47	108	108
+114	really?	\N	35	2018-04-27 11:20:13.18-07	2018-04-27 11:20:13.18-07	32	19	60	102
+115	who cares!	\N	35	2018-04-27 11:21:51.485-07	2018-04-27 11:21:51.485-07	31	18	61	98
+116	good!	\N	35	2018-04-27 11:28:19.311-07	2018-04-27 11:28:19.311-07	32	19	107	107
+135	我也想去！！	\N	43	2018-04-27 14:12:22.536-07	2018-04-27 14:12:22.536-07	33	20	59	59
+137	How good ?	\N	43	2018-04-27 14:36:12.255-07	2018-04-27 14:36:12.255-07	32	19	107	116
+\.
+
+
+--
+-- Data for Name: SequelizeMeta; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "SequelizeMeta" (name) FROM stdin;
+20180101220029-create-user.js
+20180101220044-create-activity.js
+20180103231338-create-demand.js
+20180103235237-create-activity.js
+20180104005345-create-activity.js
+20180103231338-create-wish.js
+20180107204242-create-activity-likes.js
+20180107205238-create-wish-likes.js
+20180108013640-create-activity.js
+20180108013824-create-activity-likes.js
+20180108210243-create-activity.js
+20180108210540-create-activity-likes.js
+20180108210754-create-rating.js
+20180108210229-create-favorite.js
+20180309220357-create-favorite.js
+20180309221704-create-favorite.js
+\.
+
+
+--
+-- Data for Name: Users; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "Users" (id, mail, password, username, sex, age, city, "yearOfLiving", school, occupation, "createdAt", "updatedAt", imageurl, language, bio) FROM stdin;
+31	edf@gmail.com	$2a$10$M6I4xjvmrYVYEugkvnKt7ekr4bBZeB2iNhn6glA1hfNYatm2GF3cW	哥斯拉	男	42	旧金山	20	加大伯克利	机械工程	2018-03-12 14:54:29.345-07	2018-03-12 14:57:38.416-07	\N	\N	\N
+33	wangbeile@gmail.com	$2a$10$wk3BcD5SOM/l1GrC3JxUce4N.EokikS.hN6.cU1/.BonNjhze903S	王贝勒	男	35	敦煌	20	西南大学	计算机科学	2018-03-12 15:04:25.404-07	2018-03-12 15:09:43.098-07	\N	\N	\N
+32	caogege@gmail.com	$2a$10$1/4As.4pdo2zCCeMiSIRzOLuB0ljGHo/LRuUmEIddsUwzkgx5DKtq	曹格格	男	35	珠海	20	珠海大学	计算机科学	2018-03-12 14:58:51.371-07	2018-03-12 15:11:32.387-07	\N	\N	\N
+34	1234@gmail.com	$2a$10$.zZUBCsc9IsjYFVwp28WW.ITa693zFI7gUFhVHDTO8q.muoW2ugge	王贝勒	男	35	敦煌	20	西南大学	计算机科学	2018-03-12 15:13:46.703-07	2018-03-12 15:14:08.809-07	\N	\N	\N
+36	test123@gmail.com	$2a$10$iCIBYIzNk7OpBga6YEBehuSBUU/WPcYli8zke5Rq2Znl1rCHMoMs2	理工狗	男	18	a	12	大连理工大学	计算机科学	2018-03-12 22:47:15.154-07	2018-03-14 16:35:26.669-07	\N	\N	\N
+58	123@gmail.com	$2a$10$py9iieOvsSjUCfQrNT0Nm.gNU978Mv4oCQM.YrdaHouYG03autoqG	shizuwa	女	\N	\N	\N	\N	\N	2018-04-29 21:06:17.092-07	2018-04-29 21:07:40.481-07	58/avatar-target/0636d950-4c2c-11e8-be24-811e4ac74a7a.jpeg	{"Arabic(Israel) — 阿拉伯语(以色列)","Dutch(Switzerland) — 荷兰语(比利时)"}	\N
+46	789@gmail.com	$2a$10$CWtjUo06jAAYqRhFsdJ5neb0d0n/tVePF7BMcf/SWz.w/Xj/zegai	宇宙第一奥特曼	\N	\N	\N	\N	\N	\N	2018-04-20 18:21:31.886-07	2018-04-20 18:21:31.886-07	\N	{}	\N
+59	shizu1209@gmail.com	$2a$10$yqF7x2vriX85Dg5vwbftvOtMJgDi0sq71TTS4/83IBXfr77AuMlsa	shizuwang1	\N	\N	\N	\N	\N	\N	2018-04-29 21:23:49.803-07	2018-04-29 21:23:49.803-07	\N	{}	\N
+35	corgi@gmail.com	$2a$10$X13eEz1nWte85ytpIBGa2u3h4RWEkgpr3VnJ20PAUIB.uGvpyct16	柯基的守护者	女	30 岁 ~ 35 岁	大连市 辽宁省	10	大连大学	翻译	2018-03-12 15:17:09.469-07	2018-04-26 22:08:45.051-07	35/avatar-target/0f37b4c0-49d9-11e8-ad8a-f5bf42ac8533.jpeg	{"Mandarin — 中文普通话","English(United States) — 英语(美国)","Japanese — 日语"}	\N
+43	test@gmail.com	$2a$10$7U1HzbgZ3nAH9mUAkqvgo.YpRkiJWyII0ddLn.5xY8hCmxCsy7m7u	testuser	男	30 岁 ~ 35 岁	石家庄市 河北省	\N	\N	\N	2018-04-12 20:11:36.852-07	2018-04-29 21:42:40.363-07	43/avatar-target/ebcdea90-3f7e-11e8-9807-9bb8c2b6c72d.jpeg	{"Mandarin — 中文普通话","English(United States) — 英语(美国)"}	逗逼铲屎官，爱狗子，爱生活！
+60	shizuwang@gmail.com	$2a$10$MOybSftgxPDViZgqn7mpS.jOHPIOAvZA2bYlGP53ySd4IrdlVXrEK	shizuwang1	女	18 岁 ~ 23 岁	\N	\N	\N	\N	2018-04-29 21:43:28.458-07	2018-04-29 21:44:42.565-07	\N	{"Arabic(Israel) — 阿拉伯语(以色列)"}	\N
+56	shizuw@gmail.com	$2a$10$jTzHOZ96slHMCKlWKCni6.OXtB8jexuOKn3IE4IdTbYsD6Z3MgrmC	shizuwang1	女	18 岁 ~ 23 岁	\N	\N	sfad	\N	2018-04-29 18:37:39.363-07	2018-04-29 19:09:07.185-07	56/avatar-target/e4060a40-4c17-11e8-be24-811e4ac74a7a.jpeg	{"Mandarin — 中文普通话"}	sdfasd
+44	124@google.com	$2a$10$05fQ/AzfNWycMPBwEW.L5OHqhRUDSvDwNdiwIStU5BBTugCvqUq8y	我爱豆浆油条	\N	\N	\N	\N	\N	\N	2018-04-20 18:14:40.216-07	2018-04-29 19:12:21.892-07	\N	{}	\N
+57	shizuwang1209@gmail.com	$2a$10$h2TyBxtBculhRiYJHfoCLu35WBUCJZ58ZCjE2f7wXjqhaOa2zl.OG	shizuwan	\N	\N	\N	\N	\N	\N	2018-04-29 21:02:13.65-07	2018-04-29 21:02:13.65-07	\N	{}	\N
+\.
+
+
+--
+-- Data for Name: WishLikes; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "WishLikes" (id, "numOfLikes", "userMarkers", "createdAt", "updatedAt", "wishId") FROM stdin;
+10	0		2018-03-13 14:47:38.441-07	2018-03-13 14:47:38.441-07	10
+11	0		2018-03-13 15:56:42.533-07	2018-03-13 15:56:42.533-07	11
+18	0		2018-03-22 14:07:44.185-07	2018-03-22 14:07:44.185-07	18
+20	0		2018-03-28 16:31:03.115-07	2018-03-28 16:31:03.115-07	20
+21	0		2018-03-28 16:32:31.308-07	2018-03-28 16:32:31.308-07	21
+22	0		2018-03-28 16:35:30.829-07	2018-03-28 16:35:30.829-07	22
+23	0		2018-03-30 13:33:38.5-07	2018-03-30 13:33:38.5-07	23
+24	0		2018-05-02 12:56:18.566-07	2018-05-02 12:56:18.566-07	24
+\.
+
+
+--
+-- Data for Name: Wishes; Type: TABLE DATA; Schema: public; Owner: username
+--
+
+COPY "Wishes" (id, location, departdate, finishdate, budget, services, "createdAt", "updatedAt", "userId", note, "numberOfPeople", "deleteIt") FROM stdin;
+23	三亚市 海南省	Sat, 12 May 2018 19:40:00 GMT	Sun, 13 May 2018 19:41:00 GMT	6000	{购物打折,徒步旅行}	2018-03-30 13:33:38.352-07	2018-05-02 13:32:54.703-07	35	必须是女的而且是上海本地。	5	f
+11	西安市 陕西省	Fri, 11 May 2018 10:56:00 GMT	Fri, 18 May 2018 10:56:00 GMT	1500	{徒步旅行,汽车接送}	2018-03-13 15:56:42.428-07	2018-05-02 13:34:00.343-07	35	本地向导对西安美食了如指掌：肉夹馍，凉皮，各种面食等。对古迹的了解，比如兵马俑，各种历史遗迹等。	1	f
+24	邯郸市 河北省	Fri, 25 May 2018 19:55:00 GMT	Sat, 26 May 2018 19:55:00 GMT	120	{徒步旅行}	2018-05-02 12:55:31.158-07	2018-05-02 13:39:31.314-07	35	sa	12	t
+10	三亚市 海南省	05 Apr 2018 2:47	12 Apr 2018 2:47	2000	{徒步旅行,汽车接送}	2018-03-13 14:47:38.333-07	2018-03-28 13:18:26.221-07	35	向导必须是男的，年龄在35岁左右。对地道的海鲜饭店很熟悉。会说普通话。本人不懂粤语。	2	t
+20	石家庄市 河北省	29 Mar 2018 4:30	04 Apr 2018 4:30	12	{徒步旅行}	2018-03-28 16:31:03.033-07	2018-03-28 16:31:27.529-07	35	s	12	t
+21	邯郸市 河北省	29 Mar 2018 4:32	28 Apr 2018 4:32	12	{徒步旅行}	2018-03-28 16:32:31.214-07	2018-03-28 16:32:37.951-07	35	w	12	t
+22	邯郸市 河北省	29 Mar 2018 4:32	2018-06-01T11:32:00.000Z	12	{徒步旅行}	2018-03-28 16:35:30.747-07	2018-03-28 16:35:36.956-07	35	w	12	t
+18	大连市 辽宁省	Fri, 18 May 2018 19:07:00 GMT	Thu, 24 May 2018 19:07:00 GMT	12	{徒步旅行}	2018-03-22 14:07:44.07-07	2018-05-02 12:51:14.717-07	35	无	12	f
+\.
+
+
+--
+-- Name: Activities_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"Activities_id_seq"', 81, true);
+
+
+--
+-- Name: ActivityLikes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"ActivityLikes_id_seq"', 71, true);
+
+
+--
+-- Name: Favorites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"Favorites_id_seq"', 15, true);
+
+
+--
+-- Name: Ratings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"Ratings_id_seq"', 176, true);
+
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"Users_id_seq"', 60, true);
+
+
+--
+-- Name: WishLikes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"WishLikes_id_seq"', 24, true);
+
+
+--
+-- Name: Wishes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
+--
+
+SELECT pg_catalog.setval('"Wishes_id_seq"', 24, true);
+
+
+--
+-- Name: Activities Activities_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Activities"
+    ADD CONSTRAINT "Activities_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: ActivityLikes ActivityLikes_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "ActivityLikes"
+    ADD CONSTRAINT "ActivityLikes_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Favorites Favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Favorites"
+    ADD CONSTRAINT "Favorites_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Ratings Ratings_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Ratings"
+    ADD CONSTRAINT "Ratings_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: SequelizeMeta SequelizeMeta_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "SequelizeMeta"
+    ADD CONSTRAINT "SequelizeMeta_pkey" PRIMARY KEY (name);
+
+
+--
+-- Name: Users Users_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Users"
+    ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: WishLikes WishLikes_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "WishLikes"
+    ADD CONSTRAINT "WishLikes_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Wishes Wishes_pkey; Type: CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Wishes"
+    ADD CONSTRAINT "Wishes_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Activities Activities_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Activities"
+    ADD CONSTRAINT "Activities_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: ActivityLikes ActivityLikes_activityId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "ActivityLikes"
+    ADD CONSTRAINT "ActivityLikes_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES "Activities"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: Favorites Favorites_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Favorites"
+    ADD CONSTRAINT "Favorites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: WishLikes WishLikes_wishId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "WishLikes"
+    ADD CONSTRAINT "WishLikes_wishId_fkey" FOREIGN KEY ("wishId") REFERENCES "Wishes"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: Wishes Wishes_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Wishes"
+    ADD CONSTRAINT "Wishes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: Ratings creatorid; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Ratings"
+    ADD CONSTRAINT creatorid FOREIGN KEY ("creatorId") REFERENCES "Users"(id);
+
+
+--
+-- Name: Ratings userId; Type: FK CONSTRAINT; Schema: public; Owner: username
+--
+
+ALTER TABLE ONLY "Ratings"
+    ADD CONSTRAINT "userId" FOREIGN KEY ("userId") REFERENCES "Users"(id) ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
