@@ -132,17 +132,6 @@ module.exports = (sequelize, DataTypes) => {
       });
   });
 
-  // User.beforeUpdate((user, options) => {
-  //   console.log("arguments", arguments)
-  //   return user
-  //     .cryptPassword(user.password)
-  //     .then(success => {
-  //       user.password = success;
-  //     })
-  //     .catch(err => {
-  //       if (err) console.log(err);
-  //     });
-  // });
 
   return User;
 };
